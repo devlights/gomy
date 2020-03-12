@@ -10,7 +10,7 @@ import (
 type (
 	// Mem は、実行時メモリの情報を出力する振る舞いを定義するインターフェースです.
 	Mem interface {
-		// 実行時メモリの情報を出力します.
+		// Print は、実行時メモリの情報を出力します.
 		Print(prefix string)
 		setAlloc(enabled bool)
 		setHeapAlloc(enabled bool)
@@ -59,8 +59,6 @@ func NewMem(options ...Option) Mem {
 }
 
 // Alloc の項目を有効にするかどうかを指定します.
-//
-//noinspection GoUnusedExportedFunction
 func Alloc(enabled bool) Option {
 	return func(mem Mem) {
 		mem.setAlloc(enabled)
@@ -68,8 +66,6 @@ func Alloc(enabled bool) Option {
 }
 
 // HeapAlloc の項目を有効にするかどうかを指定します.
-//
-//noinspection GoUnusedExportedFunction
 func HeapAlloc(enabled bool) Option {
 	return func(mem Mem) {
 		mem.setHeapAlloc(enabled)
@@ -77,8 +73,6 @@ func HeapAlloc(enabled bool) Option {
 }
 
 // TotalAlloc の項目を有効にするかどうかを指定します.
-//
-//noinspection GoUnusedExportedFunction
 func TotalAlloc(enabled bool) Option {
 	return func(mem Mem) {
 		mem.setTotalAlloc(enabled)
@@ -86,8 +80,6 @@ func TotalAlloc(enabled bool) Option {
 }
 
 // HeapObjects の項目を有効にするかどうかを指定します.
-//
-//noinspection GoUnusedExportedFunction
 func HeapObjects(enabled bool) Option {
 	return func(mem Mem) {
 		mem.setHeapObjects(enabled)
@@ -95,8 +87,6 @@ func HeapObjects(enabled bool) Option {
 }
 
 // Sys の項目を有効にするかどうかを指定します.
-//
-//noinspection GoUnusedExportedFunction
 func Sys(enabled bool) Option {
 	return func(mem Mem) {
 		mem.setSys(enabled)
@@ -104,8 +94,6 @@ func Sys(enabled bool) Option {
 }
 
 // NumGC の項目を有効にするかどうかを指定します.
-//
-//noinspection GoUnusedExportedFunction
 func NumGC(enabled bool) Option {
 	return func(mem Mem) {
 		mem.setNumGC(enabled)

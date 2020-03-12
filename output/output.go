@@ -78,7 +78,6 @@ func StdoutHr() {
 }
 
 // StderrHr は、水平線コメントを標準エラー出力に出力します.
-//noinspection GoUnusedExportedFunction
 func StderrHr() {
 	_pl(ErrWriter(), "--------------------------------------------------")
 }

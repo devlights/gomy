@@ -1,10 +1,111 @@
 package fileio
 
 import (
+	"io"
 	"os"
+
+	"github.com/devlights/gomy/fileio/jp"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
-// OpenAppend は、追加モードでファイルをオープンします。
-func OpenAppend(name string) (*os.File, error) {
-	return os.OpenFile(name, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+// OpenRead は、読み込みモードでファイルをオープンします。
+func OpenRead(name string, encoding jp.Encoding) (io.Reader, func() error, error) {
+	var (
+		flag = os.O_RDONLY
+	)
+
+	return openReadMode(name, flag, encoding)
+}
+
+// OpenWrite は、書き込みモードでファイルをオープンします。
+func OpenWrite(name string, encoding jp.Encoding) (io.Writer, func() error, error) {
+	var (
+		flag = os.O_RDWR | os.O_CREATE | os.O_TRUNC
+	)
+
+	return openWriteMode(name, flag, encoding)
+}
+
+// OpenAppend は、追記モードでファイルをオープンします。
+func OpenAppend(name string, encoding jp.Encoding) (io.Writer, func() error, error) {
+	var (
+		flag = os.O_APPEND | os.O_CREATE | os.O_WRONLY
+	)
+
+	return openWriteMode(name, flag, encoding)
+}
+
+func getDecoder(enc jp.Encoding) *encoding.Decoder {
+	if enc == jp.ShiftJis {
+		return japanese.ShiftJIS.NewDecoder()
+	}
+
+	if enc == jp.EucJp {
+		return japanese.EUCJP.NewDecoder()
+	}
+
+	return nil
+}
+
+func getEncoder(enc jp.Encoding) *encoding.Encoder {
+	if enc == jp.ShiftJis {
+		return japanese.ShiftJIS.NewEncoder()
+	}
+
+	if enc == jp.EucJp {
+		return japanese.EUCJP.NewEncoder()
+	}
+
+	return nil
+}
+
+func openReadMode(name string, flag int, encoding jp.Encoding) (io.Reader, func() error, error) {
+	var (
+		decoder = getDecoder(encoding)
+		reader  io.Reader
+	)
+
+	fp, err := os.OpenFile(name, flag, 0666)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	releaseFn := func() error {
+		return fp.Close()
+	}
+
+	if decoder == nil {
+		reader = fp
+	} else {
+		reader = transform.NewReader(fp, decoder)
+	}
+
+	return reader, releaseFn, nil
+}
+
+func openWriteMode(name string, flag int, encoding jp.Encoding) (io.Writer, func() error, error) {
+	var (
+		encoder = getEncoder(encoding)
+		writer  io.Writer
+	)
+
+	fp, err := os.OpenFile(name, flag, 0666)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	releaseFn := func() error {
+		_ = fp.Sync()
+		return fp.Close()
+	}
+
+	if encoder == nil {
+		writer = fp
+	} else {
+		writer = transform.NewWriter(fp, encoder)
+	}
+
+	return writer, releaseFn, nil
 }

@@ -3,15 +3,15 @@ package enumerable
 type (
 	// Range は、範囲を表すインターフェースです。
 	Range interface {
-		// 開始点の値を返します.
+		// Start は、開始点の値を返します.
 		Start() int
-		// 終了点の値を返します.
+		// End は、終了点の値を返します.
 		End() int
-		// 次の値に進みます. 進むことが出来ない場合は false を返します.
+		// Next は、次の値に進みます. 進むことが出来ない場合は false を返します.
 		Next() bool
-		// 現在の値を返します.
+		// Current は、現在の値を返します.
 		Current() int
-		// 現在の値をリセットして開始点の値に戻します. 戻り値は (リセット直前の値, 処理で発生したエラー) です.
+		// Reset は、現在の値をリセットして開始点の値に戻します. 戻り値は (リセット直前の値, 処理で発生したエラー) です.
 		Reset() (int, error)
 	}
 
@@ -29,14 +29,17 @@ func NewRange(start, end int) Range {
 	}
 }
 
+// Start は、開始店の値を返します。
 func (e *enumerableRange) Start() int {
 	return e.start
 }
 
+// End は、終了点の値を返します。
 func (e *enumerableRange) End() int {
 	return e.end
 }
 
+// Next は、次の値に進みます。進むことが出来ない場合は false を返します。
 func (e *enumerableRange) Next() bool {
 	if e.current == e.end {
 		return false
@@ -46,14 +49,12 @@ func (e *enumerableRange) Next() bool {
 	return true
 }
 
+// Current は、現在の値を返します。
 func (e *enumerableRange) Current() int {
-	if e.start == e.current {
-		return e.current
-	}
-
-	return e.current - 1
+	return e.current
 }
 
+// Reset は、現在の値をリセットして開始点の値に戻します. 戻り値は (リセット直前の値, 処理で発生したエラー) です。
 func (e *enumerableRange) Reset() (int, error) {
 	cur := e.current
 	e.current = e.start
