@@ -26,10 +26,10 @@ func WhenAll(channels ...<-chan struct{}) <-chan struct{} {
 		wg.Add(len(channels))
 
 		for _, v := range channels {
-			go func() {
+			go func(ch <-chan struct{}) {
 				defer wg.Done()
-				<-v
-			}()
+				<-ch
+			}(v)
 		}
 
 		wg.Wait()
