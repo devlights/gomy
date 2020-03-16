@@ -11,6 +11,7 @@ func TestWhenAll(t *testing.T) {
 			makeChCount int
 		}
 		testout struct {
+			limit time.Duration
 		}
 		testcase struct {
 			in  testin
@@ -21,31 +22,31 @@ func TestWhenAll(t *testing.T) {
 	cases := []testcase{
 		{
 			in:  testin{makeChCount: 0},
-			out: testout{},
+			out: testout{100 * time.Millisecond},
 		},
 		{
 			in:  testin{makeChCount: 1},
-			out: testout{},
+			out: testout{150 * time.Millisecond},
 		},
 		{
 			in:  testin{makeChCount: 2},
-			out: testout{},
+			out: testout{250 * time.Millisecond},
 		},
 		{
 			in:  testin{makeChCount: 3},
-			out: testout{},
+			out: testout{350 * time.Millisecond},
 		},
 		{
 			in:  testin{makeChCount: 4},
-			out: testout{},
+			out: testout{450 * time.Millisecond},
 		},
 		{
 			in:  testin{makeChCount: 5},
-			out: testout{},
+			out: testout{550 * time.Millisecond},
 		},
 		{
 			in:  testin{makeChCount: 6},
-			out: testout{},
+			out: testout{650 * time.Millisecond},
 		},
 	}
 
@@ -72,7 +73,12 @@ func TestWhenAll(t *testing.T) {
 				t.Errorf("want: false\tgot: %v", ok)
 			}
 
-			t.Logf("len(ch)=%d\telapsed=%v\n", len(chList), time.Since(start))
+			elapsed := time.Since(start)
+			t.Logf("len(ch)=%d\telapsed=%v\n", len(chList), elapsed)
+
+			if c.out.limit < elapsed {
+				t.Errorf("want: within %v\tgot %v", c.out.limit, elapsed)
+			}
 		}()
 	}
 }
