@@ -18,7 +18,7 @@ func WhenAny(channels ...<-chan struct{}) <-chan struct{} {
 	go func() {
 		defer close(orDone)
 
-		// 再帰呼出しの回数を抑えるために len が (2 or 3) のときは再起せずに済ませる
+		// 再帰呼出しの回数を抑えるために len が (2 or 3) のときは再帰せずに済ませる
 		switch len(channels) {
 		case 2:
 			select {
