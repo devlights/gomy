@@ -1,11 +1,10 @@
 package chans
 
 import (
-	"reflect"
 	"testing"
 )
 
-func TestFlatten(t *testing.T) {
+func TestFanIn(t *testing.T) {
 	type (
 		testin struct {
 			data [][]interface{}
@@ -50,19 +49,19 @@ func TestFlatten(t *testing.T) {
 				}()
 			}
 
-			flattenCh := Flatten(done, chList...)
+			fanInCh := FanIn(done, chList...)
 
 			results := make([]interface{}, 0, 0)
-			for v := range flattenCh {
+			for v := range fanInCh {
 				t.Log(v)
 				results = append(results, v)
 			}
 
-			// flatten の場合は、fanIn と異なり取得順序は確定なので中身も一致していることをテストする
+			// fan-in の場合は、flatten と異なり取得順序は不定となるので個数でテストする
 			t.Logf("[c.out.result] %v", c.out.result)
 			t.Logf("[results     ] %v", results)
 
-			if !reflect.DeepEqual(c.out.result, results) {
+			if len(c.out.result) != len(results) {
 				t.Errorf("want: %v\tgot: %v", c.out.result, results)
 			}
 		}()
