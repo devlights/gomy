@@ -124,3 +124,35 @@ func TestToInt(t *testing.T) {
 		}()
 	}
 }
+
+func TestToInterfaceFromInt(t *testing.T) {
+	inCh := make(chan int, 2)
+	inCh <- 1
+	inCh <- 2
+
+	close(inCh)
+
+	resultCh := ToInterfaceFromInt(inCh)
+
+	v := <-resultCh
+	t.Logf("[result] %T (%v)", v, v)
+
+	v = <-resultCh
+	t.Logf("[result] %T (%v)", v, v)
+}
+
+func TestToInterfaceFromString(t *testing.T) {
+	inCh := make(chan string, 2)
+	inCh <- "hello"
+	inCh <- "world"
+
+	close(inCh)
+
+	resultCh := ToInterfaceFromString(inCh)
+
+	v := <-resultCh
+	t.Logf("[result] %T (%v)", v, v)
+
+	v = <-resultCh
+	t.Logf("[result] %T (%v)", v, v)
+}

@@ -67,3 +67,29 @@ func ToInt(done <-chan struct{}, in <-chan interface{}, failedValue int) <-chan 
 
 	return out
 }
+
+// ToInterfaceFromInt -- chan int を chan interface{} に変換します。
+func ToInterfaceFromInt(ch <-chan int) <-chan interface{} {
+	out := make(chan interface{})
+	go func() {
+		defer close(out)
+		for v := range ch {
+			out <- v
+		}
+	}()
+
+	return out
+}
+
+// ToInterfaceFromString -- chan string を chan interface{} に変換します。
+func ToInterfaceFromString(ch <-chan string) <-chan interface{} {
+	out := make(chan interface{})
+	go func() {
+		defer close(out)
+		for v := range ch {
+			out <- v
+		}
+	}()
+
+	return out
+}
