@@ -21,11 +21,17 @@ func Take(done <-chan struct{}, in <-chan interface{}, count int) <-chan interfa
 
 // TakeWhile -- 入力用チャネルから取得した値が指定した値と同一である間、値を取得し続けるチャネルを返します。
 func TakeWhile(done <-chan struct{}, in <-chan interface{}, value interface{}) <-chan interface{} {
+	return TakeWhileFn(done, in, func() interface{} { return value })
+}
+
+// TakeWhileFn -- 入力用チャネルから取得した値が指定した関数の戻り値と同一である間、値を取得し続けるチャネルを返します。
+func TakeWhileFn(done <-chan struct{}, in <-chan interface{}, fn func() interface{}) <-chan interface{} {
 	out := make(chan interface{})
 
-	go func(value interface{}) {
+	go func(fn func() interface{}) {
 		defer close(out)
 
+		r := fn()
 		for {
 			select {
 			case <-done:
@@ -35,7 +41,7 @@ func TakeWhile(done <-chan struct{}, in <-chan interface{}, value interface{}) <
 					return
 				}
 
-				if v != value {
+				if v != r {
 					return
 				}
 
@@ -45,7 +51,7 @@ func TakeWhile(done <-chan struct{}, in <-chan interface{}, value interface{}) <
 				}
 			}
 		}
-	}(value)
+	}(fn)
 
 	return out
 }
