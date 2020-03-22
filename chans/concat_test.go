@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestFlatten(t *testing.T) {
+func TestConcat(t *testing.T) {
 	type (
 		testin struct {
 			data [][]interface{}
@@ -50,15 +50,15 @@ func TestFlatten(t *testing.T) {
 				}()
 			}
 
-			flattenCh := Flatten(done, chList...)
+			concatCh := Concat(done, chList...)
 
 			results := make([]interface{}, 0, 0)
-			for v := range flattenCh {
+			for v := range concatCh {
 				t.Log(v)
 				results = append(results, v)
 			}
 
-			// flatten の場合は、fanIn と異なり取得順序は確定なので中身も一致していることをテストする
+			// concat の場合は、fanIn と異なり取得順序は確定なので中身も一致していることをテストする
 			t.Logf("[c.out.result] %v", c.out.result)
 			t.Logf("[results     ] %v", results)
 

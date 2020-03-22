@@ -1,7 +1,7 @@
 package chans
 
-// Flatten -- 指定されたチャネルのシーケンスを順に消費していく単一のチャネルを返します。
-func Flatten(done <-chan struct{}, chList ...<-chan interface{}) <-chan interface{} {
+// Concat -- 指定されたチャネルのシーケンスを順に消費していく単一のチャネルを返します。
+func Concat(done <-chan struct{}, chList ...<-chan interface{}) <-chan interface{} {
 	if len(chList) == 0 {
 		c := make(chan interface{})
 		close(c)
