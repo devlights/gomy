@@ -48,6 +48,24 @@ func TestTimeFormat(t *testing.T) {
 				r: "2999/12/31 11:12:13.987",
 			},
 		},
+		{
+			in: testin{
+				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
+				fn: HHmmss,
+			},
+			out: testout{
+				r: "11:12:13",
+			},
+		},
+		{
+			in: testin{
+				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
+				fn: HHmmssWithMilliSec,
+			},
+			out: testout{
+				r: "11:12:13.987",
+			},
+		},
 	}
 
 	for _, c := range cases {
