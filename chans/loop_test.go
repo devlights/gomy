@@ -78,7 +78,8 @@ func TestLoopInfinite(t *testing.T) {
 
 	for i, c := range cases {
 		func() {
-			mainCtx, _ := context.WithTimeout(context.Background(), c.in.timeLimit)
+			mainCtx, cancel := context.WithTimeout(context.Background(), c.in.timeLimit)
+			defer cancel()
 
 			r := make([]int, 0, 0)
 			for v := range LoopInfinite(mainCtx.Done()) {
