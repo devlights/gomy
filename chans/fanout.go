@@ -17,8 +17,9 @@ func FanOut(done <-chan struct{}, in <-chan interface{}, workerCount int, callba
 				case <-done:
 					return
 				default:
-					callback(v)
 				}
+
+				callback(v)
 			}
 		}()
 

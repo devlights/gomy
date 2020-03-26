@@ -8,9 +8,9 @@ import (
 func TestFanOut(t *testing.T) {
 	type (
 		testin struct {
-			numGoroutine int
-			input        []interface{}
-			interval     time.Duration
+			workerCount int
+			input       []interface{}
+			interval    time.Duration
 		}
 		testout struct {
 			estimation time.Duration
@@ -24,7 +24,7 @@ func TestFanOut(t *testing.T) {
 	cases := []testcase{
 		{
 			in: testin{
-				numGoroutine: 1,
+				workerCount: 1,
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
@@ -36,7 +36,7 @@ func TestFanOut(t *testing.T) {
 		},
 		{
 			in: testin{
-				numGoroutine: 2,
+				workerCount: 2,
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
@@ -48,7 +48,7 @@ func TestFanOut(t *testing.T) {
 		},
 		{
 			in: testin{
-				numGoroutine: 3,
+				workerCount: 3,
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
@@ -69,14 +69,13 @@ func TestFanOut(t *testing.T) {
 			<-WhenAll(FanOut(
 				done,
 				ForEach(done, c.in.input...),
-				c.in.numGoroutine,
+				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)
-					// t.Logf("[test-%02d] %v", index, v)
 				})...)
 			elapsed := time.Since(start)
 
-			t.Logf("[estimation] %v\t[elapsed] %v", c.out.estimation, elapsed)
+			t.Logf("[workerCount=%d][estimation] %v\t[elapsed] %v", c.in.workerCount, c.out.estimation, elapsed)
 			if c.out.estimation < elapsed {
 				t.Errorf("want: <= %v\tgot: %v", c.out.estimation, elapsed)
 			}
