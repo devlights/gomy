@@ -66,10 +66,14 @@ func TestMergedWaitGroup(t *testing.T) {
 				wgList = append(wgList, &wg)
 
 				wg.Add(1)
-				go func(wg *sync.WaitGroup, waitTime time.Duration) {
+				go func(wg *sync.WaitGroup, waitTime time.Duration, index int) {
 					defer wg.Done()
+
+					defer t.Logf("[wg-%02d] wait done : %v", index, waitTime)
+					t.Logf("[wg-%02d] wait start: %v", index, waitTime)
+
 					<-time.After(waitTime)
-				}(&wg, c.in.waitTimes[i])
+				}(&wg, c.in.waitTimes[i], i)
 			}
 
 			mwg := NewMergedWaitGroup(wgList...)
