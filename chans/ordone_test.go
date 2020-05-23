@@ -1,55 +1,31 @@
 package chans
 
 import (
+	"context"
 	"testing"
 	"time"
 )
 
 func TestOrDone(t *testing.T) {
+	data := make([]interface{}, 0, 200)
+	for i := 0; i < 200; i++ {
+		data = append(data, i)
+	}
+
 	var (
-		done    = make(chan struct{})
-		inCh    = make(chan interface{})
-		chList  = make([]<-chan struct{}, 0, 0)
-		results = make([]interface{}, 0, 0)
+		rootCtx     = context.Background()
+		ctx, cancel = context.WithTimeout(rootCtx, 1*time.Millisecond)
+		results     []interface{}
 	)
 
-	chList = append(chList, done)
+	defer cancel()
 
-	// 3 秒後に done チャネルを閉じる
-	chList = append(chList, func() <-chan struct{} {
-		terminated := make(chan struct{})
-		go func() {
-			defer close(terminated)
-			<-time.After(3 * time.Second)
-			close(done)
-		}()
-		return terminated
-	}())
-
-	// 1 秒毎に inCh にデータを送る
-	chList = append(chList, func() <-chan struct{} {
-		terminated := make(chan struct{})
-		go func() {
-			defer close(terminated)
-			defer close(inCh)
-
-			for v := range Repeat(done, 1) {
-				inCh <- v
-				<-time.After(1 * time.Second)
-			}
-		}()
-		return terminated
-	}())
-
-	// inCh からのデータを出力
-	for v := range OrDone(done, inCh) {
+	for v := range OrDone(ctx.Done(), Generator(ctx.Done(), data...)) {
 		t.Logf("[result] %v", v)
 		results = append(results, v)
 	}
 
-	<-WhenAll(chList...)
-
-	if len(results) != 3 {
-		t.Errorf("want: 3\tgot: %v", len(results))
+	if len(results) == 0 {
+		t.Errorf("want: not 0\tgot: %v", len(results))
 	}
 }

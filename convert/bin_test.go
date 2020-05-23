@@ -23,6 +23,7 @@ func TestBin2Dec(t *testing.T) {
 		{name: "1110000 to 112", args: args{val: "1110000", prefix: "", length: 0}, want: "112", errShouldRaised: false},
 		{name: "1110000 to 0112", args: args{val: "1110000", prefix: "", length: 4}, want: "0112", errShouldRaised: false},
 		{name: "1110000 to 00000112", args: args{val: "1110000", prefix: "", length: 8}, want: "00000112", errShouldRaised: false},
+		{name: "0b1110000 to 00000112", args: args{val: "0b1110000", prefix: "", length: 8}, want: "00000112", errShouldRaised: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -64,6 +65,7 @@ func TestBin2Hex(t *testing.T) {
 		{name: "1110000 to 0x70", args: args{val: "1110000", prefix: "0x", length: 0}, want: "0x70", errShouldRaised: false},
 		{name: "1110000 to 0x0070", args: args{val: "1110000", prefix: "0x", length: 4}, want: "0x0070", errShouldRaised: false},
 		{name: "1110000 to 0x00000070", args: args{val: "1110000", prefix: "0x", length: 8}, want: "0x00000070", errShouldRaised: false},
+		{name: "0b1110000 to 0x00000070", args: args{val: "0b1110000", prefix: "0x", length: 8}, want: "0x00000070", errShouldRaised: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
