@@ -26,7 +26,7 @@ func Bin2Dec(val string, prefix string, length int) (string, error) {
 		val = strings.Replace(val, "0b", "", 1)
 	}
 
-	num, err := strconv.ParseInt(val, 2, 32)
+	num, err := strconv.ParseInt(val, 2, 64)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +62,7 @@ func Bin2Hex(val string, prefix string, length int) (string, error) {
 		val = strings.Replace(val, "0b", "", 1)
 	}
 
-	num, err := strconv.ParseInt(val, 2, 32)
+	num, err := strconv.ParseInt(val, 2, 64)
 	if err != nil {
 		return "", err
 	}

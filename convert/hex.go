@@ -26,7 +26,7 @@ func Hex2Dec(val string, prefix string, length int) (string, error) {
 		val = strings.Replace(val, "0x", "", 1)
 	}
 
-	num, err := strconv.ParseInt(val, 16, 32)
+	num, err := strconv.ParseInt(val, 16, 64)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +62,7 @@ func Hex2Bin(val string, prefix string, length int) (string, error) {
 		val = strings.Replace(val, "0x", "", 1)
 	}
 
-	num, err := strconv.ParseInt(val, 16, 32)
+	num, err := strconv.ParseInt(val, 16, 64)
 	if err != nil {
 		return "", err
 	}

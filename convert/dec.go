@@ -20,7 +20,7 @@ func Dec2Hex(val string, prefix string, length int) (string, error) {
 		return "", nil
 	}
 
-	num, err := strconv.ParseInt(val, 10, 32)
+	num, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		return "", err
 	}
@@ -51,7 +51,7 @@ func Dec2Bin(val string, prefix string, length int) (string, error) {
 		return "", nil
 	}
 
-	num, err := strconv.ParseInt(val, 10, 32)
+	num, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		return "", err
 	}
