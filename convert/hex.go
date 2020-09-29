@@ -50,8 +50,9 @@ func Hex2Dec(val string, prefix string, length int) (string, error) {
 //
 // - prefixを指定した場合、変換後の文字列の先頭に付与します.
 //
-// - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
-//   (e.g. length=4 で 16進数 8 を指定した場合 0100 となります.)
+// - lengthを指定した場合、その長さに合うようにゼロパディングします.
+//   - 0の場合はパディング無しで変換されます.
+//   - -1の場合は8の倍数でゼロパディングします.
 func Hex2Bin(val string, prefix string, length int) (string, error) {
 	if val == "" {
 		return "", nil
@@ -70,8 +71,24 @@ func Hex2Bin(val string, prefix string, length int) (string, error) {
 	format := "%s%b"
 	result := fmt.Sprintf(format, prefix, num)
 
-	if length > 0 {
+	switch {
+	case length > 0:
 		format = "%s" + "%0" + strconv.Itoa(length) + "b"
+		result = fmt.Sprintf(format, prefix, num)
+	case length < 0:
+		strBin := fmt.Sprintf("%b", num)
+		strLen := len(strBin)
+
+		actualLength := 0
+		for i := 0; ; i++ {
+			v := 8 * i
+			if strLen <= v {
+				actualLength = v
+				break
+			}
+		}
+
+		format = "%s" + "%0" + strconv.Itoa(actualLength) + "b"
 		result = fmt.Sprintf(format, prefix, num)
 	}
 

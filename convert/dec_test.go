@@ -1,6 +1,8 @@
 package convert
 
 import (
+	"math"
+	"strconv"
 	"testing"
 )
 
@@ -64,6 +66,8 @@ func TestDec2Bin(t *testing.T) {
 		{name: "112 to 0b1110000", args: args{val: "112", prefix: "0b", length: 0}, want: "0b1110000", errShouldRaised: false},
 		{name: "112 to 0b01110000", args: args{val: "112", prefix: "0b", length: 8}, want: "0b01110000", errShouldRaised: false},
 		{name: "112 to 0b000001110000", args: args{val: "112", prefix: "0b", length: 12}, want: "0b000001110000", errShouldRaised: false},
+		{name: "length==-1", args: args{val: "15", prefix: "", length: -1}, want: "00001111", errShouldRaised: false},
+		{name: "int32.max", args: args{val: strconv.Itoa(math.MaxInt32), prefix: "", length: -1}, want: "01111111111111111111111111111111", errShouldRaised: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
