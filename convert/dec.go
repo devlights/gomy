@@ -29,8 +29,7 @@ func Dec2Hex(val string, prefix string, length int) (string, error) {
 	result := fmt.Sprintf(format, prefix, num)
 
 	if length > 0 {
-		format = "%s" + "%0" + strconv.Itoa(length) + "X"
-		result = fmt.Sprintf(format, prefix, num)
+		result = fmt.Sprintf("%s%0*X", prefix, length, num)
 	}
 
 	return result, nil
@@ -62,8 +61,7 @@ func Dec2Bin(val string, prefix string, length int) (string, error) {
 
 	switch {
 	case length > 0:
-		format = "%s" + "%0" + strconv.Itoa(length) + "b"
-		result = fmt.Sprintf(format, prefix, num)
+		result = fmt.Sprintf("%s%0*b", prefix, length, num)
 	case length < 0:
 		strBin := fmt.Sprintf("%b", num)
 		strLen := len(strBin)
@@ -77,8 +75,7 @@ func Dec2Bin(val string, prefix string, length int) (string, error) {
 			}
 		}
 
-		format = "%s" + "%0" + strconv.Itoa(actualLength) + "b"
-		result = fmt.Sprintf(format, prefix, num)
+		result = fmt.Sprintf("%s%0*b", prefix, actualLength, num)
 	}
 
 	return result, nil

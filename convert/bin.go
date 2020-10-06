@@ -35,8 +35,7 @@ func Bin2Dec(val string, prefix string, length int) (string, error) {
 	result := fmt.Sprintf(format, prefix, num)
 
 	if length > 0 {
-		format = "%s" + "%0" + strconv.Itoa(length) + "d"
-		result = fmt.Sprintf(format, prefix, num)
+		result = fmt.Sprintf("%s%0*d", prefix, length, num)
 	}
 
 	return result, nil
@@ -71,8 +70,7 @@ func Bin2Hex(val string, prefix string, length int) (string, error) {
 	result := fmt.Sprintf(format, prefix, num)
 
 	if length > 0 {
-		format = "%s" + "%0" + strconv.Itoa(length) + "X"
-		result = fmt.Sprintf(format, prefix, num)
+		result = fmt.Sprintf("%s%0*X", prefix, length, num)
 	}
 
 	return result, nil
