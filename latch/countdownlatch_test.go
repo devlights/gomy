@@ -1,10 +1,18 @@
-package latch
+// Package latch_test は、latch パッケージの外部テストパッケージです。
+//
+// REF:
+//   - https://qiita.com/hogedigo/items/5f491994647aa4a8a905
+//   - https://segment.com/blog/5-advanced-testing-techniques-in-go/
+package latch_test
 
 import (
 	"log"
 	"os"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/latch"
 )
 
 func ExampleCountDownLatch() {
@@ -18,15 +26,19 @@ func ExampleCountDownLatch() {
 		waiterLog    = log.New(os.Stdout, "[waiter   ] ", 0)
 	)
 
+	var (
+		wg sync.WaitGroup
+	)
+
 	// make latch
-	l := NewCountDownLatch(latchCount)
+	l := latch.NewCountDownLatch(latchCount)
 
 	// start goroutines
-	done := make(chan struct{}, goroutineCount)
+	wg.Add(goroutineCount)
 	for i := 0; i < goroutineCount; i++ {
 		i := i
 		go func() {
-			defer func() { done <- struct{}{} }()
+			defer func() { wg.Done() }()
 
 			time.Sleep(time.Duration(1+i) * time.Second)
 			goroutineLog.Printf("done [%d]", i)
@@ -44,9 +56,7 @@ func ExampleCountDownLatch() {
 	}
 
 	// wait until all goroutine is done
-	for i := 0; i < goroutineCount; i++ {
-		<-done
-	}
+	wg.Wait()
 
 	// Output:
 	// [goroutine] done [0]
@@ -71,13 +81,14 @@ func TestCountDownLatch(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			l := NewCountDownLatch(c.latchCount)
+			var wg sync.WaitGroup
+			l := latch.NewCountDownLatch(c.latchCount)
 
-			done := make(chan struct{}, c.goroutineCount)
+			wg.Add(c.goroutineCount)
 			for i := 0; i < c.goroutineCount; i++ {
 				i := i
 				go func() {
-					defer func() { done <- struct{}{} }()
+					defer func() { wg.Done() }()
 					defer l.CountDown()
 
 					time.Sleep(1 * time.Second)
@@ -92,9 +103,7 @@ func TestCountDownLatch(t *testing.T) {
 				t.Errorf("[want] no time limit exceeded\t[got] time limited")
 			}
 
-			for i := 0; i < c.goroutineCount; i++ {
-				<-done
-			}
+			wg.Wait()
 		})
 	}
 }
@@ -115,13 +124,14 @@ func TestMultipleWaiters(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			l := NewCountDownLatch(c.latchCount)
+			var wg sync.WaitGroup
+			l := latch.NewCountDownLatch(c.latchCount)
 
-			done := make(chan struct{}, c.goroutineCount)
+			wg.Add(c.goroutineCount)
 			for i := 0; i < c.goroutineCount; i++ {
 				i := i
 				go func() {
-					defer func() { done <- struct{}{} }()
+					defer func() { wg.Done() }()
 					defer l.CountDown()
 
 					time.Sleep(1 * time.Second)
@@ -139,9 +149,7 @@ func TestMultipleWaiters(t *testing.T) {
 				}
 			}
 
-			for i := 0; i < c.goroutineCount; i++ {
-				<-done
-			}
+			wg.Wait()
 		})
 	}
 }

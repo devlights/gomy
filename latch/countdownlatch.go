@@ -1,5 +1,9 @@
 package latch
 
+import (
+	"sync"
+)
+
 type (
 	// CountDownLatch は、指定されたカウント数分の非同期処理が完了するまで
 	// １つ以上のゴルーチンを待機させる非同期イベントです。
@@ -14,7 +18,7 @@ type (
 	// ラッチがオープンとなったタイミングで、このチャネルはクローズされます。
 	CountDownLatch struct {
 		count       int
-		lock        chan struct{}
+		lock        sync.Mutex
 		signal      chan struct{}
 		latchOpened bool
 	}
@@ -24,7 +28,7 @@ type (
 func NewCountDownLatch(count int) *CountDownLatch {
 	return &CountDownLatch{
 		count:       count,
-		lock:        make(chan struct{}, 1),
+		lock:        sync.Mutex{},
 		signal:      make(chan struct{}),
 		latchOpened: false,
 	}
@@ -33,16 +37,16 @@ func NewCountDownLatch(count int) *CountDownLatch {
 // Await は、非同期処理の完了を待機する際に利用できるチャネルを返します。
 // このチャネルは、ラッチがオープンした際にクローズされます。
 func (c *CountDownLatch) Await() <-chan struct{} {
-	defer func() { <-c.lock }()
-	c.lock <- struct{}{}
+	defer func() { c.lock.Unlock() }()
+	c.lock.Lock()
 	c.openLatchIfPossible()
 	return c.signal
 }
 
 // CountDown は、ラッチをオープンするために必要なカウントを１減らします。
 func (c *CountDownLatch) CountDown() {
-	defer func() { <-c.lock }()
-	c.lock <- struct{}{}
+	defer func() { c.lock.Unlock() }()
+	c.lock.Lock()
 
 	select {
 	case <-c.signal:
