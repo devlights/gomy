@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/devlights/gomy/ctxs"
 	"github.com/devlights/gomy/chans"
+	"github.com/devlights/gomy/ctxs"
 )
 
 func ExampleToDoneCh() {
@@ -16,8 +16,8 @@ func ExampleToDoneCh() {
 	)
 
 	var (
-		iter = func(n int) []struct{}{return make([]struct{}, n)}
-		g = func(pCtx context.Context, name string, timeout time.Duration) context.Context {
+		iter = func(n int) []struct{} { return make([]struct{}, n) }
+		g    = func(pCtx context.Context, name string, timeout time.Duration) context.Context {
 			ctx, cancel := context.WithTimeout(pCtx, timeout)
 			go func() {
 				defer cancel()
@@ -30,7 +30,7 @@ func ExampleToDoneCh() {
 	)
 
 	var (
-		rootCtx = context.Background()
+		rootCtx             = context.Background()
 		mainCtx, mainCancel = context.WithCancel(rootCtx)
 	)
 
@@ -38,7 +38,7 @@ func ExampleToDoneCh() {
 
 	contexts := make([]context.Context, goroutineCount)
 	for i := range iter(goroutineCount) {
-		contexts[i] = g(mainCtx, strconv.Itoa(i), 500 * time.Millisecond)
+		contexts[i] = g(mainCtx, strconv.Itoa(i), 500*time.Millisecond)
 	}
 
 	<-chans.WhenAll(ctxs.ToDoneCh(contexts...)...)
