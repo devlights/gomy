@@ -9,7 +9,7 @@ import (
 	"github.com/devlights/gomy/ctxs"
 )
 
-func ExampleWhenAll() {
+func ExampleWhenAny() {
 	var (
 		rootCtx             = context.Background()
 		mainCtx, mainCancel = context.WithCancel(rootCtx)
@@ -24,23 +24,23 @@ func ExampleWhenAll() {
 	ctx3 := ctxs.StartGoroutine(procCtx, 300*time.Millisecond)
 
 	start := time.Now()
-	<-ctxs.WhenAll(procCtx, ctx1, ctx2, ctx3).Done()
+	<-ctxs.WhenAny(procCtx, ctx1, ctx2, ctx3).Done()
 	elapsed := time.Since(start)
 
 	fmt.Printf("elapsed: %vmsec\n", elapsed.Milliseconds())
 
 	// Output:
-	// elapsed: 300msec
+	// elapsed: 100msec
 }
 
-func TestWhenAll(t *testing.T) {
+func TestWhenAny(t *testing.T) {
 	cases := []struct {
 		name   string
 		delays []time.Duration
 		limit  time.Duration
 	}{
-		{"100,200,300", []time.Duration{100 * time.Millisecond, 200 * time.Millisecond, 300 * time.Millisecond}, 400 * time.Millisecond},
-		{"100,500", []time.Duration{100 * time.Millisecond, 500 * time.Millisecond}, 600 * time.Millisecond},
+		{"100,200,300", []time.Duration{100 * time.Millisecond, 200 * time.Millisecond, 300 * time.Millisecond}, 110 * time.Millisecond},
+		{"100,500", []time.Duration{100 * time.Millisecond, 500 * time.Millisecond}, 110 * time.Millisecond},
 	}
 
 	for _, c := range cases {
@@ -61,7 +61,7 @@ func TestWhenAll(t *testing.T) {
 				tasks = append(tasks, ctxs.StartGoroutine(procCtx, delay))
 			}
 
-			<-ctxs.WhenAll(procCtx, tasks...).Done()
+			<-ctxs.WhenAny(procCtx, tasks...).Done()
 
 			elapsed := time.Since(start)
 			if c.limit < elapsed {
