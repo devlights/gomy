@@ -11,7 +11,15 @@ func Take(done <-chan struct{}, in <-chan interface{}, count int) <-chan interfa
 			select {
 			case <-done:
 				return
-			case out <- <-in:
+			case v, ok := <-in:
+				if !ok {
+					break
+				}
+
+				select {
+				case <-done:
+				case out <- v:
+				}
 			}
 		}
 	}()
