@@ -14,13 +14,15 @@ func TestTake(t *testing.T) {
 			count int
 		}
 		testcase struct {
-			in  testin
-			out testout
+			name string
+			in   testin
+			out  testout
 		}
 	)
 
 	cases := []testcase{
 		{
+			name: "total10,count0",
 			in: testin{
 				total: 10,
 				count: 0,
@@ -28,6 +30,7 @@ func TestTake(t *testing.T) {
 			out: testout{count: 0},
 		},
 		{
+			name: "total10,count1",
 			in: testin{
 				total: 10,
 				count: 1,
@@ -35,6 +38,7 @@ func TestTake(t *testing.T) {
 			out: testout{count: 1},
 		},
 		{
+			name: "total10,count5",
 			in: testin{
 				total: 10,
 				count: 5,
@@ -42,16 +46,25 @@ func TestTake(t *testing.T) {
 			out: testout{count: 5},
 		},
 		{
+			name: "total10,count10",
 			in: testin{
 				total: 10,
 				count: 10,
 			},
 			out: testout{count: 10},
 		},
+		{
+			name: "total10,count12",
+			in: testin{
+				total: 10,
+				count: 12,
+			},
+			out: testout{count: 10},
+		},
 	}
 
-	for caseCount, c := range cases {
-		func() {
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
@@ -67,15 +80,14 @@ func TestTake(t *testing.T) {
 			takeCh := Take(done, inCh, c.in.count)
 
 			recvCount := 0
-			for v := range takeCh {
-				t.Logf("[test-%02d][take] %v\n", caseCount+1, v)
+			for range takeCh {
 				recvCount++
 			}
 
 			if c.out.count != recvCount {
 				t.Errorf("want: %v\tgot: %v", c.out.count, recvCount)
 			}
-		}()
+		})
 	}
 }
 
@@ -89,13 +101,15 @@ func TestTakeWhile(t *testing.T) {
 			count int
 		}
 		testcase struct {
-			in  testin
-			out testout
+			name string
+			in   testin
+			out  testout
 		}
 	)
 
 	cases := []testcase{
 		{
+			name: "1-only",
 			in: testin{
 				data:  []int{1},
 				value: 1,
@@ -103,6 +117,7 @@ func TestTakeWhile(t *testing.T) {
 			out: testout{count: 1},
 		},
 		{
+			name: "1, 1, 1, 1, 1, 2, 2",
 			in: testin{
 				data:  []int{1, 1, 1, 1, 1, 2, 2},
 				value: 1,
@@ -110,6 +125,7 @@ func TestTakeWhile(t *testing.T) {
 			out: testout{count: 5},
 		},
 		{
+			name: "1, 1, 2, 1, 1, 2, 2",
 			in: testin{
 				data:  []int{1, 1, 2, 1, 1, 2, 2},
 				value: 1,
@@ -118,8 +134,8 @@ func TestTakeWhile(t *testing.T) {
 		},
 	}
 
-	for caseCount, c := range cases {
-		func() {
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
@@ -135,15 +151,14 @@ func TestTakeWhile(t *testing.T) {
 			takeCh := TakeWhile(done, inCh, c.in.value)
 
 			recvCount := 0
-			for v := range takeCh {
-				t.Logf("[test-%02d][take] %v\n", caseCount+1, v)
+			for range takeCh {
 				recvCount++
 			}
 
 			if c.out.count != recvCount {
 				t.Errorf("want: %v\tgot: %v", c.out.count, recvCount)
 			}
-		}()
+		})
 	}
 }
 
@@ -157,13 +172,15 @@ func TestTakeWhileFn(t *testing.T) {
 			count int
 		}
 		testcase struct {
-			in  testin
-			out testout
+			name string
+			in   testin
+			out  testout
 		}
 	)
 
 	cases := []testcase{
 		{
+			name: "1-only",
 			in: testin{
 				data: []int{1},
 				fn:   func() interface{} { return 1 },
@@ -171,6 +188,7 @@ func TestTakeWhileFn(t *testing.T) {
 			out: testout{count: 1},
 		},
 		{
+			name: "1, 1, 1, 1, 1, 2, 2",
 			in: testin{
 				data: []int{1, 1, 1, 1, 1, 2, 2},
 				fn:   func() interface{} { return 1 },
@@ -178,6 +196,7 @@ func TestTakeWhileFn(t *testing.T) {
 			out: testout{count: 5},
 		},
 		{
+			name: "1, 1, 2, 1, 1, 2, 2",
 			in: testin{
 				data: []int{1, 1, 2, 1, 1, 2, 2},
 				fn:   func() interface{} { return 1 },
@@ -186,8 +205,8 @@ func TestTakeWhileFn(t *testing.T) {
 		},
 	}
 
-	for caseCount, c := range cases {
-		func() {
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
@@ -203,14 +222,13 @@ func TestTakeWhileFn(t *testing.T) {
 			takeCh := TakeWhileFn(done, inCh, c.in.fn)
 
 			recvCount := 0
-			for v := range takeCh {
-				t.Logf("[test-%02d][take] %v\n", caseCount+1, v)
+			for range takeCh {
 				recvCount++
 			}
 
 			if c.out.count != recvCount {
 				t.Errorf("want: %v\tgot: %v", c.out.count, recvCount)
 			}
-		}()
+		})
 	}
 }
