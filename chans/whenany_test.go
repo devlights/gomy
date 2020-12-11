@@ -32,22 +32,6 @@ func TestWhenAny(t *testing.T) {
 			in:  testin{makeChCount: 2},
 			out: testout{150 * time.Millisecond},
 		},
-		{
-			in:  testin{makeChCount: 3},
-			out: testout{150 * time.Millisecond},
-		},
-		{
-			in:  testin{makeChCount: 4},
-			out: testout{150 * time.Millisecond},
-		},
-		{
-			in:  testin{makeChCount: 5},
-			out: testout{150 * time.Millisecond},
-		},
-		{
-			in:  testin{makeChCount: 6},
-			out: testout{150 * time.Millisecond},
-		},
 	}
 
 	makeCh := func(closeAfter time.Duration) <-chan struct{} {

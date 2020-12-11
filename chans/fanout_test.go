@@ -28,10 +28,10 @@ func TestFanOut(t *testing.T) {
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
-				interval: 100 * time.Millisecond,
+				interval: 10 * time.Millisecond,
 			},
 			out: testout{
-				estimation: ((6/1 + 1) * 100) * time.Millisecond,
+				estimation: (((6/1 + 1) * 10) + 20) * time.Millisecond,
 			},
 		},
 		{
@@ -40,10 +40,10 @@ func TestFanOut(t *testing.T) {
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
-				interval: 100 * time.Millisecond,
+				interval: 10 * time.Millisecond,
 			},
 			out: testout{
-				estimation: ((6/2 + 1) * 100) * time.Millisecond,
+				estimation: (((6/2 + 1) * 10) + 20) * time.Millisecond,
 			},
 		},
 		{
@@ -52,10 +52,10 @@ func TestFanOut(t *testing.T) {
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
-				interval: 100 * time.Millisecond,
+				interval: 10 * time.Millisecond,
 			},
 			out: testout{
-				estimation: ((6/3 + 1) * 100) * time.Millisecond,
+				estimation: (((6/3 + 1) * 10) + 20) * time.Millisecond,
 			},
 		},
 	}
@@ -106,10 +106,10 @@ func TestFanOutWg(t *testing.T) {
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
-				interval: 100 * time.Millisecond,
+				interval: 10 * time.Millisecond,
 			},
 			out: testout{
-				estimation: ((6/1 + 1) * 100) * time.Millisecond,
+				estimation: ((6/1 + 1) * 10) * time.Millisecond,
 			},
 		},
 		{
@@ -118,10 +118,10 @@ func TestFanOutWg(t *testing.T) {
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
-				interval: 100 * time.Millisecond,
+				interval: 10 * time.Millisecond,
 			},
 			out: testout{
-				estimation: ((6/2 + 1) * 100) * time.Millisecond,
+				estimation: ((6/2 + 1) * 10) * time.Millisecond,
 			},
 		},
 		{
@@ -130,10 +130,10 @@ func TestFanOutWg(t *testing.T) {
 				input: []interface{}{
 					1, 2, 3, 4, 5, 6,
 				},
-				interval: 100 * time.Millisecond,
+				interval: 10 * time.Millisecond,
 			},
 			out: testout{
-				estimation: ((6/3 + 1) * 100) * time.Millisecond,
+				estimation: ((6/3 + 1) * 10) * time.Millisecond,
 			},
 		},
 	}
