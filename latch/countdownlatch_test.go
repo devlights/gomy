@@ -40,7 +40,7 @@ func ExampleCountDownLatch() {
 		go func() {
 			defer func() { wg.Done() }()
 
-			time.Sleep(time.Duration(1+i) * time.Second)
+			time.Sleep(time.Duration(1+i) * 100 * time.Millisecond)
 			goroutineLog.Printf("done [%d]", i)
 
 			l.CountDown()
@@ -91,7 +91,7 @@ func TestCountDownLatch(t *testing.T) {
 					defer func() { wg.Done() }()
 					defer l.CountDown()
 
-					time.Sleep(1 * time.Second)
+					time.Sleep(100 * time.Millisecond)
 					t.Logf("[goroutine] countdown [%d]", i)
 				}()
 			}
@@ -134,7 +134,7 @@ func TestMultipleWaiters(t *testing.T) {
 					defer func() { wg.Done() }()
 					defer l.CountDown()
 
-					time.Sleep(1 * time.Second)
+					time.Sleep(100 * time.Millisecond)
 					t.Logf("[goroutine] countdown [%d]", i)
 				}()
 			}
