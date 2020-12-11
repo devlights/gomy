@@ -20,8 +20,9 @@ build:
 
 .PHONY: test
 test:
-	$(GOTEST) -v ./...
+	$(GOTEST) ./...
 
 .PHONY: clean
 clean:
 	$(GOCLEAN)
+	$(GOCLEAN) --testcache ./...
