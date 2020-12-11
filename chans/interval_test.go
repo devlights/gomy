@@ -35,13 +35,6 @@ func TestInterval(t *testing.T) {
 			},
 			out: testout{estimation: (100*5 + 10) * time.Millisecond},
 		},
-		{
-			in: testin{
-				input:    []interface{}{1, 2, 3, 4, 5},
-				interval: 1000 * time.Millisecond,
-			},
-			out: testout{estimation: (1000*5 + 10) * time.Millisecond},
-		},
 	}
 
 	for caseIndex, c := range cases {

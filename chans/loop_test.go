@@ -71,7 +71,7 @@ func TestLoopInfinite(t *testing.T) {
 
 	cases := []testcase{
 		{
-			in:  testin{timeLimit: 1 * time.Second},
+			in:  testin{timeLimit: 100 * time.Millisecond},
 			out: testout{},
 		},
 	}
