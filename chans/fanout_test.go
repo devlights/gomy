@@ -1,6 +1,8 @@
 package chans
 
 import (
+	"reflect"
+	"sort"
 	"testing"
 	"time"
 )
@@ -13,6 +15,7 @@ func TestFanOut(t *testing.T) {
 			interval    time.Duration
 		}
 		testout struct {
+			results    []int
 			estimation time.Duration
 		}
 		testcase struct {
@@ -31,6 +34,7 @@ func TestFanOut(t *testing.T) {
 				interval: 10 * time.Millisecond,
 			},
 			out: testout{
+				results:    []int{2, 4, 6, 8, 10, 12},
 				estimation: (((6/1 + 1) * 10) + 20) * time.Millisecond,
 			},
 		},
@@ -43,6 +47,7 @@ func TestFanOut(t *testing.T) {
 				interval: 10 * time.Millisecond,
 			},
 			out: testout{
+				results:    []int{2, 4, 6, 8, 10, 12},
 				estimation: (((6/2 + 1) * 10) + 20) * time.Millisecond,
 			},
 		},
@@ -55,6 +60,7 @@ func TestFanOut(t *testing.T) {
 				interval: 10 * time.Millisecond,
 			},
 			out: testout{
+				results:    []int{2, 4, 6, 8, 10, 12},
 				estimation: (((6/3 + 1) * 10) + 20) * time.Millisecond,
 			},
 		},
@@ -65,19 +71,33 @@ func TestFanOut(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
+			results := make(chan int, len(c.in.input))
+
 			start := time.Now()
-			<-WhenAll(FanOut(
+			wa := WhenAll(FanOut(
 				done,
 				ForEach(done, c.in.input...),
 				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)
-				})...)
-			elapsed := time.Since(start)
 
-			t.Logf("[workerCount=%d][estimation] %v\t[elapsed] %v", c.in.workerCount, c.out.estimation, elapsed)
-			if c.out.estimation < elapsed {
-				t.Errorf("want: <= %v\tgot: %v", c.out.estimation, elapsed)
+					if i, ok := v.(int); ok {
+						results <- (i * 2)
+					}
+				})...)
+
+			<-wa
+			close(results)
+			t.Logf("[workerCount=%d][estimation] %v\t[elapsed] %v", c.in.workerCount, c.out.estimation, time.Since(start))
+
+			var values []int
+			for v := range results {
+				values = append(values, v)
+			}
+
+			sort.Ints(values)
+			if !reflect.DeepEqual(c.out.results, values) {
+				t.Errorf("[want] %v\t[got] %v", c.out.results, values)
 			}
 		}(caseIndex + 1)
 	}
@@ -91,6 +111,7 @@ func TestFanOutWg(t *testing.T) {
 			interval    time.Duration
 		}
 		testout struct {
+			results    []int
 			estimation time.Duration
 		}
 		testcase struct {
@@ -109,6 +130,7 @@ func TestFanOutWg(t *testing.T) {
 				interval: 10 * time.Millisecond,
 			},
 			out: testout{
+				results:    []int{2, 4, 6, 8, 10, 12},
 				estimation: ((6/1 + 1) * 10) * time.Millisecond,
 			},
 		},
@@ -121,6 +143,7 @@ func TestFanOutWg(t *testing.T) {
 				interval: 10 * time.Millisecond,
 			},
 			out: testout{
+				results:    []int{2, 4, 6, 8, 10, 12},
 				estimation: ((6/2 + 1) * 10) * time.Millisecond,
 			},
 		},
@@ -133,6 +156,7 @@ func TestFanOutWg(t *testing.T) {
 				interval: 10 * time.Millisecond,
 			},
 			out: testout{
+				results:    []int{2, 4, 6, 8, 10, 12},
 				estimation: ((6/3 + 1) * 10) * time.Millisecond,
 			},
 		},
@@ -143,6 +167,8 @@ func TestFanOutWg(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
+			results := make(chan int, len(c.in.input))
+
 			start := time.Now()
 			wg := FanOutWg(
 				done,
@@ -150,13 +176,24 @@ func TestFanOutWg(t *testing.T) {
 				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)
+
+					if i, ok := v.(int); ok {
+						results <- (i * 2)
+					}
 				})
 			wg.Wait()
-			elapsed := time.Since(start)
+			close(results)
 
-			t.Logf("[workerCount=%d][estimation] %v\t[elapsed] %v", c.in.workerCount, c.out.estimation, elapsed)
-			if c.out.estimation < elapsed {
-				t.Errorf("want: <= %v\tgot: %v", c.out.estimation, elapsed)
+			t.Logf("[workerCount=%d][estimation] %v\t[elapsed] %v", c.in.workerCount, c.out.estimation, time.Since(start))
+
+			var values []int
+			for v := range results {
+				values = append(values, v)
+			}
+
+			sort.Ints(values)
+			if !reflect.DeepEqual(c.out.results, values) {
+				t.Errorf("[want] %v\t[got] %v", c.out.results, values)
 			}
 		}(caseIndex + 1)
 	}
