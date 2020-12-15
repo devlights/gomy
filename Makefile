@@ -16,11 +16,11 @@ all: clean build test
 
 .PHONY: build
 build:
-	$(GOBUILD) ./...
+	$(GOBUILD) -race ./...
 
 .PHONY: test
 test:
-	$(GOTEST) ./...
+	$(GOTEST) -race ./...
 
 .PHONY: clean
 clean:
