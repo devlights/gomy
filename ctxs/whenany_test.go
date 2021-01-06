@@ -27,10 +27,10 @@ func ExampleWhenAny() {
 	<-ctxs.WhenAny(procCtx, ctx1, ctx2, ctx3).Done()
 	elapsed := time.Since(start)
 
-	fmt.Printf("elapsed: %vmsec\n", elapsed.Milliseconds())
+	fmt.Printf("elapsed: about 100msec ==> %v\n", elapsed <= 110*time.Millisecond)
 
 	// Output:
-	// elapsed: 100msec
+	// elapsed: about 100msec ==> true
 }
 
 func TestWhenAny(t *testing.T) {

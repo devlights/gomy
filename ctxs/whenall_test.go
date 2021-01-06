@@ -27,10 +27,10 @@ func ExampleWhenAll() {
 	<-ctxs.WhenAll(procCtx, ctx1, ctx2, ctx3).Done()
 	elapsed := time.Since(start)
 
-	fmt.Printf("elapsed: %vmsec\n", elapsed.Milliseconds())
+	fmt.Printf("elapsed: about 300msec ==> %v\n", elapsed <= 310*time.Millisecond)
 
 	// Output:
-	// elapsed: 300msec
+	// elapsed: about 300msec ==> true
 }
 
 func TestWhenAll(t *testing.T) {
