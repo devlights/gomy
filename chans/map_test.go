@@ -1,16 +1,18 @@
-package chans
+package chans_test
 
 import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestMap(t *testing.T) {
 	type (
 		testin struct {
 			input []interface{}
-			fn    MapFunc
+			fn    chans.MapFunc
 		}
 		testout struct {
 			result []interface{}
@@ -39,9 +41,9 @@ func TestMap(t *testing.T) {
 			defer close(done)
 
 			results := make([]interface{}, 0, 0)
-			for m := range Map(done, ForEach(done, c.in.input...), c.in.fn) {
+			for m := range chans.Map(done, chans.ForEach(done, c.in.input...), c.in.fn) {
 
-				if v, ok := m.(*MapValue); ok {
+				if v, ok := m.(*chans.MapValue); ok {
 					t.Logf("[test-%02d] [%v] ==> [%v]", caseIndex, v.Before, v.After)
 					results = append(results, v.After)
 				}

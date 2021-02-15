@@ -1,7 +1,9 @@
-package chans
+package chans_test
 
 import (
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestTee(t *testing.T) {
@@ -53,7 +55,7 @@ func TestTee(t *testing.T) {
 				}
 			}()
 
-			out1, out2 := Tee(done, inCh)
+			out1, out2 := chans.Tee(done, inCh)
 
 			result1 := make([]interface{}, 0, 0)
 			result2 := make([]interface{}, 0, 0)

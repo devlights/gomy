@@ -1,9 +1,11 @@
-package chans
+package chans_test
 
 import (
 	"context"
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestOrDone(t *testing.T) {
@@ -20,7 +22,7 @@ func TestOrDone(t *testing.T) {
 
 	defer cancel()
 
-	for v := range OrDone(ctx.Done(), Generator(ctx.Done(), data...)) {
+	for v := range chans.OrDone(ctx.Done(), chans.Generator(ctx.Done(), data...)) {
 		t.Logf("[result] %v", v)
 		results = append(results, v)
 	}

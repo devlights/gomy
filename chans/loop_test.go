@@ -1,10 +1,12 @@
-package chans
+package chans_test
 
 import (
 	"context"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestLoop(t *testing.T) {
@@ -44,7 +46,7 @@ func TestLoop(t *testing.T) {
 			defer close(done)
 
 			r := make([]int, 0, 0)
-			for v := range Loop(done, c.in.start, c.in.end) {
+			for v := range chans.Loop(done, c.in.start, c.in.end) {
 				t.Logf("[test-%02d] %v", i, v)
 				r = append(r, v)
 			}
@@ -82,7 +84,7 @@ func TestLoopInfinite(t *testing.T) {
 			defer cancel()
 
 			r := make([]int, 0, 0)
-			for v := range LoopInfinite(mainCtx.Done()) {
+			for v := range chans.LoopInfinite(mainCtx.Done()) {
 				t.Logf("[test-%02d] %v", i, v)
 				r = append(r, v)
 

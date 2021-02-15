@@ -1,9 +1,39 @@
-package chans
+package chans_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/chans"
 )
+
+func ExampleWhenAny() {
+	fn := func(tlimit time.Duration) <-chan struct{} {
+		done := make(chan struct{})
+		go func() {
+			defer close(done)
+			select {
+			case <-time.After(tlimit):
+			}
+		}()
+
+		return done
+	}
+
+	done1 := fn(100 * time.Millisecond)
+	done2 := fn(200 * time.Millisecond)
+	done3 := fn(300 * time.Millisecond)
+
+	start := time.Now()
+	<-chans.WhenAny(done1, done2, done3)
+	elapsed := time.Since(start)
+	
+	fmt.Printf("elapsed: about 100msec ==> %v\n", elapsed <= 110*time.Millisecond)
+
+	// Output:
+	// elapsed: about 100msec ==> true
+}
 
 func TestWhenAny(t *testing.T) {
 	type (
@@ -53,7 +83,7 @@ func TestWhenAny(t *testing.T) {
 			}
 
 			start := time.Now()
-			if _, ok := <-WhenAny(chList...); ok {
+			if _, ok := <-chans.WhenAny(chList...); ok {
 				t.Errorf("want: false\tgot: %v", ok)
 			}
 

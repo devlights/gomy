@@ -1,7 +1,9 @@
-package chans
+package chans_test
 
 import (
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestTake(t *testing.T) {
@@ -77,7 +79,7 @@ func TestTake(t *testing.T) {
 				}
 			}()
 
-			takeCh := Take(done, inCh, c.in.count)
+			takeCh := chans.Take(done, inCh, c.in.count)
 
 			recvCount := 0
 			for range takeCh {
@@ -148,7 +150,7 @@ func TestTakeWhile(t *testing.T) {
 				}
 			}()
 
-			takeCh := TakeWhile(done, inCh, c.in.value)
+			takeCh := chans.TakeWhile(done, inCh, c.in.value)
 
 			recvCount := 0
 			for range takeCh {
@@ -219,7 +221,7 @@ func TestTakeWhileFn(t *testing.T) {
 				}
 			}()
 
-			takeCh := TakeWhileFn(done, inCh, c.in.fn)
+			takeCh := chans.TakeWhileFn(done, inCh, c.in.fn)
 
 			recvCount := 0
 			for range takeCh {

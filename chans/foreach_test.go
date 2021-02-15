@@ -1,8 +1,10 @@
-package chans
+package chans_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestForEach(t *testing.T) {
@@ -32,7 +34,7 @@ func TestForEach(t *testing.T) {
 			defer close(done)
 
 			results := make([]interface{}, 0, 0)
-			for v := range ForEach(done, c.in.input...) {
+			for v := range chans.ForEach(done, c.in.input...) {
 				t.Logf("[test-%02d] %v", caseIndex, v)
 				results = append(results, v)
 			}
