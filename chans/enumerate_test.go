@@ -1,7 +1,9 @@
-package chans
+package chans_test
 
 import (
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestEnumerate(t *testing.T) {
@@ -51,8 +53,8 @@ func TestEnumerate(t *testing.T) {
 				}
 			}()
 
-			for e := range Enumerate(done, inCh) {
-				if v, ok := e.(*IterValue); ok {
+			for e := range chans.Enumerate(done, inCh) {
+				if v, ok := e.(*chans.IterValue); ok {
 					t.Logf("[test-%02d] [%v][%v]", caseIndex, v.Index, v.Value)
 
 					r := c.out.output[v.Index]

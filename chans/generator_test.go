@@ -1,9 +1,11 @@
-package chans
+package chans_test
 
 import (
 	"context"
 	"reflect"
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestGenerator(t *testing.T) {
@@ -47,7 +49,7 @@ func TestGenerator(t *testing.T) {
 			ctx, cancel := context.WithCancel(rootCtx)
 			defer cancel()
 
-			outCh := Generator(ctx.Done(), c.in.values...)
+			outCh := chans.Generator(ctx.Done(), c.in.values...)
 			for v := range outCh {
 				results = append(results, v)
 			}

@@ -1,7 +1,9 @@
-package chans
+package chans_test
 
 import (
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestSkip(t *testing.T) {
@@ -64,7 +66,7 @@ func TestSkip(t *testing.T) {
 				}
 			}()
 
-			skipCh := Skip(done, inCh, c.in.count)
+			skipCh := chans.Skip(done, inCh, c.in.count)
 
 			recvCount := 0
 			for v := range skipCh {
@@ -132,7 +134,7 @@ func TestSkipWhile(t *testing.T) {
 				}
 			}()
 
-			skipCh := SkipWhile(done, inCh, c.in.value)
+			skipCh := chans.SkipWhile(done, inCh, c.in.value)
 
 			recvCount := 0
 			for v := range skipCh {
@@ -200,7 +202,7 @@ func TestSkipWhileFn(t *testing.T) {
 				}
 			}()
 
-			skipCh := SkipWhileFn(done, inCh, c.in.fn)
+			skipCh := chans.SkipWhileFn(done, inCh, c.in.fn)
 
 			recvCount := 0
 			for v := range skipCh {

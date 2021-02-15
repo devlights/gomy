@@ -1,7 +1,9 @@
-package chans
+package chans_test
 
 import (
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestRepeat(t *testing.T) {
@@ -42,7 +44,7 @@ func TestRepeat(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			repeatCh := Repeat(done, c.in.data...)
+			repeatCh := chans.Repeat(done, c.in.data...)
 
 			result1 := <-repeatCh
 			result2 := <-repeatCh
@@ -95,7 +97,7 @@ func TestRepeatFn(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			repeatCh := RepeatFn(done, c.in.fn)
+			repeatCh := chans.RepeatFn(done, c.in.fn)
 
 			result1 := <-repeatCh
 			result2 := <-repeatCh

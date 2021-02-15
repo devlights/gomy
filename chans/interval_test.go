@@ -1,8 +1,10 @@
-package chans
+package chans_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestInterval(t *testing.T) {
@@ -44,7 +46,7 @@ func TestInterval(t *testing.T) {
 
 			start := time.Now()
 			var lastElapsed time.Duration
-			for v := range Interval(done, ForEach(done, c.in.input...), c.in.interval) {
+			for v := range chans.Interval(done, chans.ForEach(done, c.in.input...), c.in.interval) {
 				lastElapsed = time.Since(start)
 				t.Logf("[test-%02d] %v (%v)", caseIndex, v, lastElapsed)
 			}

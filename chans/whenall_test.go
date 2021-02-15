@@ -1,8 +1,10 @@
-package chans
+package chans_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestWhenAll(t *testing.T) {
@@ -53,7 +55,7 @@ func TestWhenAll(t *testing.T) {
 			}
 
 			start := time.Now()
-			if _, ok := <-WhenAll(chList...); ok {
+			if _, ok := <-chans.WhenAll(chList...); ok {
 				t.Errorf("want: false\tgot: %v", ok)
 			}
 

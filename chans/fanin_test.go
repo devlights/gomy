@@ -1,7 +1,9 @@
-package chans
+package chans_test
 
 import (
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestFanIn(t *testing.T) {
@@ -49,7 +51,7 @@ func TestFanIn(t *testing.T) {
 				}()
 			}
 
-			fanInCh := FanIn(done, chList...)
+			fanInCh := chans.FanIn(done, chList...)
 
 			results := make([]interface{}, 0, 0)
 			for v := range fanInCh {

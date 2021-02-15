@@ -1,10 +1,12 @@
-package chans
+package chans_test
 
 import (
 	"reflect"
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestFanOut(t *testing.T) {
@@ -74,9 +76,9 @@ func TestFanOut(t *testing.T) {
 			results := make(chan int, len(c.in.input))
 
 			start := time.Now()
-			wa := WhenAll(FanOut(
+			wa := chans.WhenAll(chans.FanOut(
 				done,
-				ForEach(done, c.in.input...),
+				chans.ForEach(done, c.in.input...),
 				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)
@@ -170,9 +172,9 @@ func TestFanOutWg(t *testing.T) {
 			results := make(chan int, len(c.in.input))
 
 			start := time.Now()
-			wg := FanOutWg(
+			wg := chans.FanOutWg(
 				done,
-				ForEach(done, c.in.input...),
+				chans.ForEach(done, c.in.input...),
 				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)

@@ -1,9 +1,11 @@
-package chans
+package chans_test
 
 import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestFilter(t *testing.T) {
@@ -72,7 +74,7 @@ func TestFilter(t *testing.T) {
 			}()
 
 			results := make([]interface{}, 0, 0)
-			for v := range Filter(done, inCh, c.in.predicate) {
+			for v := range chans.Filter(done, inCh, c.in.predicate) {
 				t.Logf("[test-%02d] %v", caseIndex, v)
 				results = append(results, v)
 			}
