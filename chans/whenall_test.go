@@ -9,7 +9,7 @@ import (
 )
 
 func ExampleWhenAll() {
-		fn := func(tlimit time.Duration) <-chan struct{} {
+	fn := func(tlimit time.Duration) <-chan struct{} {
 		done := make(chan struct{})
 		go func() {
 			defer close(done)
@@ -28,7 +28,7 @@ func ExampleWhenAll() {
 	start := time.Now()
 	<-chans.WhenAll(done1, done2, done3)
 	elapsed := time.Since(start)
-	
+
 	fmt.Printf("elapsed: about 300msec ==> %v\n", elapsed >= 299*time.Millisecond)
 
 	// Output:
