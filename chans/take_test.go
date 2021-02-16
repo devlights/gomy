@@ -55,6 +55,29 @@ func ExampleTakeWhile() {
 	// 1
 }
 
+func ExampleTakeWhileFn() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	numbers := chans.ForEach(procCtx.Done(), 1, 1, 1, 4, 1)
+	takes := chans.TakeWhileFn(procCtx.Done(), numbers, func() interface{} { return 1 })
+
+	for v := range takes {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 1
+	// 1
+	// 1
+}
+
 func TestTake(t *testing.T) {
 	type (
 		testin struct {
