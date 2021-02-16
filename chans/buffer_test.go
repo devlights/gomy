@@ -1,23 +1,34 @@
 package chans_test
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/devlights/gomy/chans"
 )
 
 func ExampleBuffer() {
 	var (
-		done  = make(chan struct{})
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
 		data  = []interface{}{1, 2, 3, 4, 5, 6, 7}
 		count = 3
 	)
 
-	defer close(done)
+	numbers := chans.Generator(procCtx.Done(), data...)
+	chunks := chans.Buffer(procCtx.Done(), numbers, count)
 
-	for chunk := range chans.Buffer(done, chans.Generator(done, data...), count) {
+	for chunk := range chunks {
 		fmt.Println(chunk)
 	}
 
