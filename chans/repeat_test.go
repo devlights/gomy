@@ -9,6 +9,46 @@ import (
 	"github.com/devlights/gomy/chans"
 )
 
+func ExampleRepeatFn() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	ch := make(chan interface{})
+	go func() {
+		defer close(ch)
+		for {
+			for _, v := range []int{1, 2, 3} {
+				select {
+				case <-procCtx.Done():
+					return
+				case ch <- v:
+				}
+			}
+		}
+	}()
+
+	repeats := chans.RepeatFn(procCtx.Done(), func() interface{} { return <-ch })
+	takes := chans.Take(procCtx.Done(), repeats, 6)
+
+	for v := range takes {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 1
+	// 2
+	// 3
+	// 1
+	// 2
+	// 3
+}
+
 func ExampleRepeat() {
 	var (
 		rootCtx          = context.Background()
