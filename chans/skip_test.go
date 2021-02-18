@@ -9,6 +9,28 @@ import (
 	"github.com/devlights/gomy/chans"
 )
 
+func ExampleSkipWhileFn() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 5)
+	items := chans.SkipWhileFn(procCtx.Done(), numbers, func() interface{} { return 1 })
+
+	for v := range items {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 4
+	// 5
+}
+
 func ExampleSkipWhile() {
 	var (
 		rootCtx          = context.Background()
