@@ -1,10 +1,39 @@
 package chans_test
 
 import (
+	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/devlights/gomy/chans"
 )
+
+func ExampleRepeat() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	repeats := chans.Repeat(procCtx.Done(), 1, 2, 3)
+	takes := chans.Take(procCtx.Done(), repeats, 6)
+
+	for v := range takes {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 1
+	// 2
+	// 3
+	// 1
+	// 2
+	// 3
+}
 
 func TestRepeat(t *testing.T) {
 	type (
