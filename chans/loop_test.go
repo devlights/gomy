@@ -10,6 +10,35 @@ import (
 	"github.com/devlights/gomy/chans"
 )
 
+func ExampleLoopInfinite() {
+	// contexts
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 10*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	// channels
+	var (
+		infinite = chans.LoopInfinite(procCtx.Done())
+		takes    = chans.Take(procCtx.Done(), chans.FromIntCh(infinite), 5)
+	)
+
+	for v := range takes {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 0
+	// 1
+	// 2
+	// 3
+	// 4
+}
+
 func ExampleLoop() {
 	var (
 		rootCtx          = context.Background()
