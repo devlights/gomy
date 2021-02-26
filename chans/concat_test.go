@@ -1,9 +1,40 @@
-package chans
+package chans_test
 
 import (
+	"context"
+	"fmt"
 	"reflect"
 	"testing"
+	"time"
+
+	"github.com/devlights/gomy/chans"
 )
+
+func ExampleConcat() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	nums1 := chans.Generator(procCtx.Done(), 1, 2, 3)
+	nums2 := chans.Generator(procCtx.Done(), 4, 5, 6)
+
+	for v := range chans.Concat(procCtx.Done(), nums1, nums2) {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 1
+	// 2
+	// 3
+	// 4
+	// 5
+	// 6
+}
 
 func TestConcat(t *testing.T) {
 	type (
@@ -50,9 +81,9 @@ func TestConcat(t *testing.T) {
 				}()
 			}
 
-			concatCh := Concat(done, chList...)
+			concatCh := chans.Concat(done, chList...)
 
-			results := make([]interface{}, 0, 0)
+			results := make([]interface{}, 0)
 			for v := range concatCh {
 				t.Log(v)
 				results = append(results, v)
