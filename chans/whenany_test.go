@@ -13,9 +13,7 @@ func ExampleWhenAny() {
 		done := make(chan struct{})
 		go func() {
 			defer close(done)
-			select {
-			case <-time.After(tlimit):
-			}
+			time.Sleep(tlimit)
 		}()
 
 		return done
@@ -28,7 +26,7 @@ func ExampleWhenAny() {
 	start := time.Now()
 	<-chans.WhenAny(done1, done2, done3)
 	elapsed := time.Since(start)
-	
+
 	fmt.Printf("elapsed: about 100msec ==> %v\n", elapsed <= 110*time.Millisecond)
 
 	// Output:

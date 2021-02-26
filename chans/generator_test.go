@@ -51,8 +51,8 @@ func TestGenerator(t *testing.T) {
 	cases := []testcase{
 		{
 			name: "empty",
-			in:   testin{values: make([]interface{}, 0, 0)},
-			out:  testout{results: make([]interface{}, 0, 0)},
+			in:   testin{values: make([]interface{}, 0)},
+			out:  testout{results: make([]interface{}, 0)},
 		},
 		{
 			name: "1 to 5",
@@ -68,7 +68,7 @@ func TestGenerator(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			results := make([]interface{}, 0, 0)
+			results := make([]interface{}, 0)
 
 			rootCtx := context.Background()
 			ctx, cancel := context.WithCancel(rootCtx)
