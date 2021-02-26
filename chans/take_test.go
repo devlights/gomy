@@ -1,82 +1,10 @@
 package chans_test
 
 import (
-	"context"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/devlights/gomy/chans"
 )
-
-func ExampleTake() {
-	var (
-		rootCtx          = context.Background()
-		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
-	)
-
-	defer mainCxl()
-	defer procCxl()
-
-	numbers := chans.ForEach(procCtx.Done(), 1, 2, 3, 4, 5)
-	takes := chans.Take(procCtx.Done(), numbers, 3)
-
-	for v := range takes {
-		fmt.Println(v)
-	}
-
-	// Output:
-	// 1
-	// 2
-	// 3
-}
-
-func ExampleTakeWhile() {
-	var (
-		rootCtx          = context.Background()
-		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
-	)
-
-	defer mainCxl()
-	defer procCxl()
-
-	numbers := chans.ForEach(procCtx.Done(), 1, 1, 1, 4, 1)
-	takes := chans.TakeWhile(procCtx.Done(), numbers, 1)
-
-	for v := range takes {
-		fmt.Println(v)
-	}
-
-	// Output:
-	// 1
-	// 1
-	// 1
-}
-
-func ExampleTakeWhileFn() {
-	var (
-		rootCtx          = context.Background()
-		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
-	)
-
-	defer mainCxl()
-	defer procCxl()
-
-	numbers := chans.ForEach(procCtx.Done(), 1, 1, 1, 4, 1)
-	takes := chans.TakeWhileFn(procCtx.Done(), numbers, func() interface{} { return 1 })
-
-	for v := range takes {
-		fmt.Println(v)
-	}
-
-	// Output:
-	// 1
-	// 1
-	// 1
-}
 
 func TestTake(t *testing.T) {
 	type (

@@ -2,36 +2,11 @@ package chans_test
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/devlights/gomy/chans"
 )
-
-func ExampleGenerator() {
-	var (
-		rootCtx          = context.Background()
-		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
-	)
-
-	defer mainCxl()
-	defer procCxl()
-
-	numbers := chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
-	for v := range numbers {
-		fmt.Println(v)
-	}
-
-	// Output:
-	// 1
-	// 2
-	// 3
-	// 4
-	// 5
-}
 
 func TestGenerator(t *testing.T) {
 	type (

@@ -1,34 +1,11 @@
 package chans_test
 
 import (
-	"context"
-	"fmt"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/devlights/gomy/chans"
 )
-
-func ExampleForEach() {
-	var (
-		rootCtx          = context.Background()
-		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
-	)
-
-	defer mainCxl()
-	defer procCxl()
-
-	for v := range chans.ForEach(procCtx.Done(), 1, 2, 3) {
-		fmt.Println(v)
-	}
-
-	// Output:
-	// 1
-	// 2
-	// 3
-}
 
 func TestForEach(t *testing.T) {
 	type (
