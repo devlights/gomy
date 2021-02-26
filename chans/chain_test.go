@@ -1,52 +1,12 @@
 package chans_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/devlights/gomy/chans"
 )
-
-func ExampleChain() {
-	// functions
-	var (
-		makeGoroutine = func() <-chan struct{} {
-			ch := make(chan struct{})
-			go func() {
-				defer close(ch)
-				time.Sleep(100 * time.Millisecond)
-				fmt.Println("base")
-			}()
-			return ch
-		}
-	)
-
-	// channels
-	var (
-		done = make(chan struct{})
-		base = makeGoroutine()
-	)
-
-	defer close(done)
-
-	chain1 := chans.Chain(done, base, func(t time.Time) {
-		fmt.Println("chain-1")
-	})
-
-	chain2 := chans.Chain(done, chain1, func(t time.Time) {
-		fmt.Println("chain-2")
-	})
-
-	<-chans.WhenAll(base, chain1, chain2)
-
-	// Output:
-	//
-	// base
-	// chain-1
-	// chain-2
-}
 
 func TestChain(t *testing.T) {
 	cases := []struct {

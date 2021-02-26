@@ -1,38 +1,10 @@
 package chans_test
 
 import (
-	"context"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/devlights/gomy/chans"
 )
-
-func ExampleEnumerate() {
-	var (
-		rootCtx          = context.Background()
-		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
-	)
-
-	defer mainCxl()
-	defer procCxl()
-
-	numbers := chans.Generator(procCtx.Done(), 9, 8, 7)
-	values := chans.Enumerate(procCtx.Done(), numbers)
-
-	for e := range values {
-		if v, ok := e.(*chans.IterValue); ok {
-			fmt.Printf("%d:%v\n", v.Index, v.Value)
-		}
-	}
-
-	// Output:
-	// 0:9
-	// 1:8
-	// 2:7
-}
 
 func TestEnumerate(t *testing.T) {
 	type (
