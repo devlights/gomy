@@ -97,7 +97,7 @@ func TestLoop(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			r := make([]int, 0, 0)
+			r := make([]int, 0)
 			for v := range chans.Loop(done, c.in.start, c.in.end) {
 				t.Logf("[test-%02d] %v", i, v)
 				r = append(r, v)
@@ -135,7 +135,7 @@ func TestLoopInfinite(t *testing.T) {
 			mainCtx, cancel := context.WithTimeout(context.Background(), c.in.timeLimit)
 			defer cancel()
 
-			r := make([]int, 0, 0)
+			r := make([]int, 0)
 			for v := range chans.LoopInfinite(mainCtx.Done()) {
 				t.Logf("[test-%02d] %v", i, v)
 				r = append(r, v)

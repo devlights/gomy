@@ -56,7 +56,7 @@ func TestForEach(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			results := make([]interface{}, 0, 0)
+			results := make([]interface{}, 0)
 			for v := range chans.ForEach(done, c.in.input...) {
 				t.Logf("[test-%02d] %v", caseIndex, v)
 				results = append(results, v)

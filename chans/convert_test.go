@@ -1,8 +1,10 @@
-package chans
+package chans_test
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/devlights/gomy/chans"
 )
 
 func TestToString(t *testing.T) {
@@ -51,9 +53,9 @@ func TestToString(t *testing.T) {
 				}
 			}()
 
-			toStrCh := ToString(done, inCh, "")
+			toStrCh := chans.ToString(done, inCh, "")
 
-			results := make([]string, 0, 0)
+			results := make([]string, 0)
 			for s := range toStrCh {
 				results = append(results, s)
 			}
@@ -111,9 +113,9 @@ func TestToInt(t *testing.T) {
 				}
 			}()
 
-			toIntCh := ToInt(done, inCh, -1)
+			toIntCh := chans.ToInt(done, inCh, -1)
 
-			results := make([]int, 0, 0)
+			results := make([]int, 0)
 			for i := range toIntCh {
 				results = append(results, i)
 			}
@@ -132,7 +134,7 @@ func TestFromIntCh(t *testing.T) {
 
 	close(inCh)
 
-	resultCh := FromIntCh(inCh)
+	resultCh := chans.FromIntCh(inCh)
 
 	v := <-resultCh
 	t.Logf("[result] %T (%v)", v, v)
@@ -148,7 +150,7 @@ func TestFromStringCh(t *testing.T) {
 
 	close(inCh)
 
-	resultCh := FromStringCh(inCh)
+	resultCh := chans.FromStringCh(inCh)
 
 	v := <-resultCh
 	t.Logf("[result] %T (%v)", v, v)

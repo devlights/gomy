@@ -40,7 +40,7 @@ func TestMap(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			results := make([]interface{}, 0, 0)
+			results := make([]interface{}, 0)
 			for m := range chans.Map(done, chans.ForEach(done, c.in.input...), c.in.fn) {
 
 				if v, ok := m.(*chans.MapValue); ok {

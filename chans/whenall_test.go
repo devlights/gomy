@@ -13,9 +13,7 @@ func ExampleWhenAll() {
 		done := make(chan struct{})
 		go func() {
 			defer close(done)
-			select {
-			case <-time.After(tlimit):
-			}
+			time.Sleep(tlimit)
 		}()
 
 		return done

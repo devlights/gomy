@@ -53,7 +53,7 @@ func TestFanIn(t *testing.T) {
 
 			fanInCh := chans.FanIn(done, chList...)
 
-			results := make([]interface{}, 0, 0)
+			results := make([]interface{}, 0)
 			for v := range fanInCh {
 				t.Log(v)
 				results = append(results, v)

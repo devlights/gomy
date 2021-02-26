@@ -57,8 +57,8 @@ func TestTee(t *testing.T) {
 
 			out1, out2 := chans.Tee(done, inCh)
 
-			result1 := make([]interface{}, 0, 0)
-			result2 := make([]interface{}, 0, 0)
+			result1 := make([]interface{}, 0)
+			result2 := make([]interface{}, 0)
 			for v := range out1 {
 				v2 := <-out2
 

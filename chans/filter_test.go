@@ -29,11 +29,7 @@ func TestFilter(t *testing.T) {
 				input: []interface{}{"hello", "world"},
 				predicate: func(v interface{}) bool {
 					if s, ok := v.(string); ok {
-						if strings.HasPrefix(s, "w") {
-							return true
-						}
-
-						return false
+						return strings.HasPrefix(s, "w")
 					}
 
 					return false
@@ -46,11 +42,7 @@ func TestFilter(t *testing.T) {
 				input: []interface{}{1, 2, 3, 4, 5},
 				predicate: func(v interface{}) bool {
 					if i, ok := v.(int); ok {
-						if i <= 3 {
-							return true
-						}
-
-						return false
+						return i <= 3
 					}
 
 					return false
@@ -73,7 +65,7 @@ func TestFilter(t *testing.T) {
 				}
 			}()
 
-			results := make([]interface{}, 0, 0)
+			results := make([]interface{}, 0)
 			for v := range chans.Filter(done, inCh, c.in.predicate) {
 				t.Logf("[test-%02d] %v", caseIndex, v)
 				results = append(results, v)

@@ -4,7 +4,7 @@ package chans
 func FanIn(done <-chan struct{}, channels ...<-chan interface{}) <-chan interface{} {
 	out := make(chan interface{})
 
-	chList := make([]<-chan struct{}, 0, 0)
+	chList := make([]<-chan struct{}, 0)
 	for _, in := range channels {
 		chList = append(chList, func() <-chan struct{} {
 			terminated := make(chan struct{})
