@@ -8,6 +8,36 @@ import (
 	"github.com/devlights/gomy/chans"
 )
 
+func ExampleBridge() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	chSeq := make(chan (<-chan interface{}))
+	go func() {
+		defer close(chSeq)
+		chSeq <- chans.Generator(procCtx.Done(), 1, 2, 3)
+		chSeq <- chans.Generator(procCtx.Done(), 4, 5, 6)
+	}()
+
+	for v := range chans.Bridge(procCtx.Done(), chSeq) {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 1
+	// 2
+	// 3
+	// 4
+	// 5
+	// 6
+}
+
 func ExampleBuffer() {
 	var (
 		rootCtx          = context.Background()
