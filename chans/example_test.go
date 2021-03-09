@@ -251,6 +251,33 @@ func ExampleLoopInfinite() {
 	// 4
 }
 
+func ExampleInterval() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		numbers      = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
+		withInterval = chans.Interval(procCtx.Done(), numbers, 5*time.Millisecond)
+	)
+
+	begin := time.Now()
+	for range withInterval {
+		// no-op
+	}
+	elapsed := time.Since(begin)
+
+	fmt.Printf("elapsed <= 30msec: %v\n", elapsed < 30*time.Millisecond)
+
+	// Output:
+	// elapsed <= 30msec: true
+}
+
 func ExampleLoop() {
 	var (
 		rootCtx          = context.Background()
