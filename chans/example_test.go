@@ -179,6 +179,35 @@ func ExampleEnumerate() {
 	// 2:7
 }
 
+func ExampleFilter() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		numbers   = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
+		predicate = func(v interface{}) bool {
+			if i, ok := v.(int); ok {
+				return i%2 == 0
+			}
+			return false
+		}
+	)
+
+	for v := range chans.Filter(procCtx.Done(), numbers, predicate) {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 2
+	// 4
+}
+
 func ExampleForEach() {
 	var (
 		rootCtx          = context.Background()
