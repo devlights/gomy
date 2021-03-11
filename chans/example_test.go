@@ -301,10 +301,10 @@ func ExampleInterval() {
 	}
 	elapsed := time.Since(begin)
 
-	fmt.Printf("elapsed <= 30msec: %v\n", elapsed < 30*time.Millisecond)
+	fmt.Printf("elapsed <= 35msec: %v\n", elapsed < 35*time.Millisecond)
 
 	// Output:
-	// elapsed <= 30msec: true
+	// elapsed <= 35msec: true
 }
 
 func ExampleLoop() {
@@ -327,6 +327,38 @@ func ExampleLoop() {
 	// 2
 	// 3
 	// 4
+}
+
+func ExampleMap() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		numbers = chans.Generator(procCtx.Done(), 1, 2, 3)
+		fn      = func(original interface{}) (after interface{}) {
+			if i, ok := original.(int); ok {
+				return i * 2
+			}
+			return nil
+		}
+	)
+
+	for v := range chans.Map(procCtx.Done(), numbers, fn) {
+		if m, ok := v.(*chans.MapValue); ok {
+			fmt.Printf("%v,%v\n", m.Before, m.After)
+		}
+	}
+
+	// Output:
+	// 1,2
+	// 2,4
+	// 3,6
 }
 
 func ExampleOrDone() {
