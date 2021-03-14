@@ -228,6 +228,84 @@ func ExampleForEach() {
 	// 3
 }
 
+func ExampleFromIntCh() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var ints <-chan int = func(pCtx context.Context) <-chan int {
+		ctx, cxl := context.WithCancel(pCtx)
+		ch := make(chan int)
+
+		go func() {
+			defer cxl()
+			defer close(ch)
+			for i := 0; i < 3; i++ {
+				select {
+				case <-ctx.Done():
+					return
+				case ch <- i:
+				}
+			}
+		}()
+		return ch
+	}(procCtx)
+
+	var items <-chan interface{} = chans.FromIntCh(ints)
+	for v := range items {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 0
+	// 1
+	// 2
+}
+
+func ExampleFromStringCh() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Microsecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var strs <-chan string = func(pCtx context.Context) <-chan string {
+		ctx, cxl := context.WithCancel(pCtx)
+		ch := make(chan string)
+		go func() {
+			defer cxl()
+			defer close(ch)
+			for _, s := range []string{"h", "e", "l", "l", "o"} {
+				select {
+				case <-ctx.Done():
+				case ch <- s:
+				}
+			}
+		}()
+		return ch
+	}(procCtx)
+
+	var items <-chan interface{} = chans.FromStringCh(strs)
+	for v := range items {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// h
+	// e
+	// l
+	// l
+	// o
+}
+
 func ExampleGenerator() {
 	var (
 		rootCtx          = context.Background()
@@ -588,6 +666,54 @@ func ExampleTakeWhileFn() {
 	// 1
 	// 1
 	// 1
+}
+
+func ExampleToInt() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		gens <-chan interface{} = chans.Generator(procCtx.Done(), 1, 2)
+		ints <-chan int         = chans.ToInt(procCtx.Done(), gens, -1)
+	)
+
+	for v := range ints {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// 1
+	// 2
+}
+
+func ExampleToString() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		gens <-chan interface{} = chans.Generator(procCtx.Done(), "hello", "world")
+		strs <-chan string      = chans.ToString(procCtx.Done(), gens, "")
+	)
+
+	for v := range strs {
+		fmt.Println(v)
+	}
+
+	// Output:
+	// hello
+	// world
 }
 
 func ExampleWhenAll() {
