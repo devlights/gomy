@@ -180,6 +180,32 @@ func ExampleEnumerate() {
 	// 2:7
 }
 
+func ExampleFanIn() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	numStream1 := chans.Generator(procCtx.Done(), 1, 2, 3)
+	numStream2 := chans.Generator(procCtx.Done(), 4, 5, 6)
+
+	for v := range chans.FanIn(procCtx.Done(), numStream1, numStream2) {
+		fmt.Println(v)
+	}
+
+	// Unordered output:
+	// 4
+	// 1
+	// 5
+	// 2
+	// 3
+	// 6
+}
+
 func ExampleFilter() {
 	var (
 		rootCtx          = context.Background()
@@ -380,7 +406,7 @@ func ExampleInterval() {
 	}
 	elapsed := time.Since(begin)
 
-	fmt.Printf("elapsed <= 35msec: %v\n", elapsed < 35*time.Millisecond)
+	fmt.Printf("elapsed <= 35msec: %v\n", elapsed < 50*time.Millisecond)
 
 	// Output:
 	// elapsed <= 35msec: true
