@@ -206,6 +206,33 @@ func ExampleFanIn() {
 	// 6
 }
 
+func ExampleFanOut() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		nums     = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5, 6)
+		callback = func(v interface{}) { fmt.Println(v) }
+	)
+
+	dones := chans.FanOut(procCtx.Done(), nums, 3, callback)
+	<-chans.WhenAll(dones...)
+
+	// Unordered output:
+	// 4
+	// 1
+	// 2
+	// 3
+	// 6
+	// 5
+}
+
 func ExampleFilter() {
 	var (
 		rootCtx          = context.Background()
