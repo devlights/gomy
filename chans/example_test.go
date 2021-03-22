@@ -271,7 +271,7 @@ func ExampleFromStringCh() {
 	var (
 		rootCtx          = context.Background()
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Microsecond)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
 
 	defer mainCxl()
