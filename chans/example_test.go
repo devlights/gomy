@@ -3,6 +3,7 @@ package chans_test
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/devlights/gomy/chans"
@@ -271,7 +272,7 @@ func ExampleFromStringCh() {
 	var (
 		rootCtx          = context.Background()
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
-		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Microsecond)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
 
 	defer mainCxl()
@@ -664,6 +665,37 @@ func ExampleTakeWhileFn() {
 
 	// Output:
 	// 1
+	// 1
+	// 1
+}
+
+func ExampleTee() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+
+	defer mainCxl()
+	defer procCxl()
+
+	numbers := chans.Generator(procCtx.Done(), 1)
+	ch1, ch2 := chans.Tee(procCtx.Done(), numbers)
+
+	var wg sync.WaitGroup
+	for _, ch := range []<-chan interface{}{ch1, ch2} {
+		wg.Add(1)
+		go func(ch <-chan interface{}) {
+			defer wg.Done()
+			for v := range ch {
+				fmt.Println(v)
+			}
+		}(ch)
+	}
+
+	wg.Wait()
+
+	// Output:
 	// 1
 	// 1
 }
