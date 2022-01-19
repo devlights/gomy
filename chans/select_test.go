@@ -119,3 +119,52 @@ func TestRecvAny(t *testing.T) {
 		})
 	}
 }
+
+func TestRecvAll(t *testing.T) {
+	tests := []struct {
+		name string
+		in   []interface{}
+		out  []chans.SelectValue
+	}{
+		{
+			"3-chans",
+			[]interface{}{1, 2, 3},
+			[]chans.SelectValue{
+				{2, 3},
+				{1, 2},
+				{0, 1},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			chs := make([]chan interface{}, len(test.in))
+			for i, v := range test.in {
+				var (
+					i, v = i, v
+					ch   = make(chan interface{})
+				)
+				go func() {
+					ch <- v
+				}()
+				chs[i] = ch
+			}
+
+			for _, v := range chans.RecvAll(chs...) {
+				found := false
+				for _, d := range test.out {
+					if v.Eq(d) {
+						found = true
+						break
+					}
+				}
+
+				if !found {
+					t.Errorf("[not-found] %v", v)
+				}
+			}
+		})
+	}
+}
