@@ -640,6 +640,32 @@ func ExampleSelect() {
 	// 2
 }
 
+func ExampleRecvAny() {
+	var (
+		ch1 = make(chan interface{})
+		ch2 = make(chan interface{})
+	)
+	defer close(ch1)
+	defer close(ch2)
+
+	go func() {
+		ch1 <- 1
+	}()
+	go func() {
+		ch2 <- 2
+	}()
+
+	_, v1, _ := chans.RecvAny(ch1, ch2)
+	_, v2, _ := chans.RecvAny(ch1, ch2)
+
+	fmt.Println(v1)
+	fmt.Println(v2)
+
+	// Unordered output:
+	// 1
+	// 2
+}
+
 func ExampleSkipWhileFn() {
 	var (
 		rootCtx          = context.Background()

@@ -31,3 +31,10 @@ func Select(chs ...chan interface{}) (chosen int, v interface{}, ok bool) {
 
 	return chosen, v, ok
 }
+
+// RecvAny -- 指定されたチャネルリストから一つ値を取得します。どのチャネルが選択されるかは非決定的です。
+//
+// See: chans.Select
+func RecvAny(chs ...chan interface{}) (chosen int, v interface{}, ok bool) {
+	return Select(chs...)
+}
