@@ -666,6 +666,30 @@ func ExampleRecvAny() {
 	// 2
 }
 
+func ExampleRecvAll() {
+	var (
+		ch1 = make(chan interface{})
+		ch2 = make(chan interface{})
+	)
+	defer close(ch1)
+	defer close(ch2)
+
+	go func() {
+		ch1 <- 1
+	}()
+	go func() {
+		ch2 <- 2
+	}()
+
+	for _, v := range chans.RecvAll(ch1, ch2) {
+		fmt.Printf("chosen:%d,value:%v\n", v.Chosen, v.Value)
+	}
+
+	// Unordered output:
+	// chosen:0,value:1
+	// chosen:1,value:2
+}
+
 func ExampleSkipWhileFn() {
 	var (
 		rootCtx          = context.Background()
