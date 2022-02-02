@@ -26,3 +26,10 @@ test:
 clean:
 	$(GOCLEAN)
 	$(GOCLEAN) --testcache ./...
+
+build-cmds:
+	go build github.com/devlights/gomy/cmd/splitbin
+	go build github.com/devlights/gomy/cmd/disphex
+
+clean-cmds:
+	rm -f ./splitbin ./disphex
