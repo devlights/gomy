@@ -7,10 +7,21 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
-func run(r io.Reader, w io.Writer, sep string, col int) error {
+func toS(items []int) string {
+	var s string
+
+	for _, item := range items {
+		s = fmt.Sprintf("%s%d,", s, item)
+	}
+
+	return s[:len(s)-1]
+}
+
+func run(r io.Reader, w io.Writer, sep string, col int, fields []int) error {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		var (
@@ -31,8 +42,21 @@ func run(r io.Reader, w io.Writer, sep string, col int) error {
 			return fmt.Errorf("error at decoding process (%s)", data)
 		}
 
-		for _, b := range decoded {
-			fmt.Fprintf(w, "%02x ", b)
+		if len(fields) == 0 {
+			fmt.Fprintln(w, data)
+			continue
+		}
+
+		fmt.Fprintf(w, "%s:%s:%s:", parts[0], parts[1], toS(fields))
+
+		var curr int
+		for _, field := range fields {
+			next := curr + field
+			if len(decoded) < next {
+				break
+			}
+			fmt.Fprintf(w, "%02x:", decoded[curr:next])
+			curr = next
 		}
 		fmt.Fprintln(w, "")
 	}
@@ -40,26 +64,15 @@ func run(r io.Reader, w io.Writer, sep string, col int) error {
 	return scanner.Err()
 }
 
-func open(path string) (rc io.ReadCloser, err error) {
-	if path == "" {
-		rc = io.NopCloser(os.Stdin)
-		return
-	}
-
-	rc, err = os.Open(path)
-	return
-}
-
-func args() (path string, sep string, col int, err error) {
+func args() (sep string, col int, fields []int, err error) {
 	var (
-		p = flag.String("f", "", "path to datafile (default stdin)")
+		f = flag.String("fields", "", "field-list (ex: 20,2,2,4)")
 		s = flag.String("sep", ":", "separator")
 		c = flag.Int("col", 2, "column number (zero start)")
 	)
 
 	flag.Parse()
 
-	path = *p
 	sep = *s
 	col = *c
 
@@ -68,24 +81,27 @@ func args() (path string, sep string, col int, err error) {
 		return
 	}
 
+	fs := strings.Split(*f, ",")
+	for _, v := range fs {
+		i, e := strconv.Atoi(v)
+		if e != nil {
+			err = e
+			return
+		}
+		fields = append(fields, i)
+	}
+
 	return
 }
 
 func main() {
-	path, sep, col, err := args()
+	sep, col, fields, err := args()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	rc, err := open(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[ERR] Cannot open file: %s(%v)\n", path, err)
-		os.Exit(2)
-	}
-	defer rc.Close()
-
-	if err = run(rc, os.Stdout, sep, col); err != nil {
+	if err = run(os.Stdin, os.Stdout, sep, col, fields); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(3)
 	}

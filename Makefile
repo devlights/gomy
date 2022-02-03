@@ -29,7 +29,8 @@ clean:
 
 build-cmds:
 	go build github.com/devlights/gomy/cmd/splitbin
+	go build github.com/devlights/gomy/cmd/splitrec
 	go build github.com/devlights/gomy/cmd/disphex
 
 clean-cmds:
-	rm -f ./splitbin ./disphex
+	rm -f ./splitbin ./splitrec ./disphex
