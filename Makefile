@@ -31,6 +31,7 @@ build-cmds:
 	go build github.com/devlights/gomy/cmd/splitbin
 	go build github.com/devlights/gomy/cmd/splitrec
 	go build github.com/devlights/gomy/cmd/disphex
+	go build github.com/devlights/gomy/cmd/extract
 
 clean-cmds:
-	rm -f ./splitbin ./splitrec ./disphex
+	rm -f ./splitbin ./splitrec ./disphex ./extract
