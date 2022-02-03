@@ -19,7 +19,8 @@ func run(r io.Reader, w io.Writer, sep string, col int) error {
 		)
 
 		if len(parts)-1 < col {
-			return fmt.Errorf("there are not enough columns for processing (%d)", len(parts))
+			fmt.Fprintln(w, "")
+			continue
 		}
 
 		var (
