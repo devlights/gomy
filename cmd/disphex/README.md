@@ -18,8 +18,6 @@ $ ./disphex -h
 Usage of ./disphex:
   -col int
         column number (zero start) (default 2)
-  -f string
-        path to datafile (default stdin)
   -sep string
         separator (default ":")
 
