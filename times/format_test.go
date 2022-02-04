@@ -1,14 +1,16 @@
-package times
+package times_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/devlights/gomy/times"
 )
 
 func TestTimeFormat(t *testing.T) {
 	type (
 		testin struct {
-			t  time.Time
+			t  times.Formatter
 			fn func(t time.Time) string
 		}
 		testout struct {
@@ -20,11 +22,19 @@ func TestTimeFormat(t *testing.T) {
 		}
 	)
 
+	var (
+		f1 = times.Formatter(time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local))
+		f2 = times.Formatter(time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local))
+		f3 = times.Formatter(time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local))
+		f4 = times.Formatter(time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local))
+		f5 = times.Formatter(time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local))
+	)
+
 	cases := []testcase{
 		{
 			in: testin{
-				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
-				fn: YyyyMmdd,
+				t:  f1,
+				fn: f1.YyyyMmdd,
 			},
 			out: testout{
 				r: "2999/12/31",
@@ -32,8 +42,8 @@ func TestTimeFormat(t *testing.T) {
 		},
 		{
 			in: testin{
-				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
-				fn: YyyyMmddHHmmss,
+				t:  f2,
+				fn: f2.YyyyMmddHHmmss,
 			},
 			out: testout{
 				r: "2999/12/31 11:12:13",
@@ -41,8 +51,8 @@ func TestTimeFormat(t *testing.T) {
 		},
 		{
 			in: testin{
-				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
-				fn: YyyyMmddHHmmssWithMilliSec,
+				t:  f3,
+				fn: f3.YyyyMmddHHmmssWithMilliSec,
 			},
 			out: testout{
 				r: "2999/12/31 11:12:13.987",
@@ -50,8 +60,8 @@ func TestTimeFormat(t *testing.T) {
 		},
 		{
 			in: testin{
-				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
-				fn: HHmmss,
+				t:  f4,
+				fn: f4.HHmmss,
 			},
 			out: testout{
 				r: "11:12:13",
@@ -59,8 +69,8 @@ func TestTimeFormat(t *testing.T) {
 		},
 		{
 			in: testin{
-				t:  time.Date(2999, 12, 31, 11, 12, 13, 987654321, time.Local),
-				fn: HHmmssWithMilliSec,
+				t:  f5,
+				fn: f5.HHmmssWithMilliSec,
 			},
 			out: testout{
 				r: "11:12:13.987",
@@ -69,7 +79,7 @@ func TestTimeFormat(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		result := c.in.fn(c.in.t)
+		result := c.in.fn(time.Time(c.in.t))
 		if c.out.r != result {
 			t.Errorf("want: %v\tgot: %v", c.out.r, result)
 		}
