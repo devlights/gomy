@@ -14,8 +14,13 @@ PKG_NAME=github.com/$(GITHUB_USER)/$(PRJ_NAME)
 .PHONY: all
 all: clean build test
 
+.PHONY: prepare
+prepare:
+	$(GOCMD) mod download
+	$(GOINSTALL) honnef.co/go/tools/cmd/staticcheck@latest
+
 .PHONY: build
-build:
+build: prepare
 	$(GOBUILD) -race ./...
 
 .PHONY: test
