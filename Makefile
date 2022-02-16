@@ -12,7 +12,7 @@ GITHUB_USER=devlights
 PKG_NAME=github.com/$(GITHUB_USER)/$(PRJ_NAME)
 
 .PHONY: all
-all: clean build test
+all: clean build cover
 
 .PHONY: prepare
 prepare:
@@ -26,6 +26,10 @@ build: prepare
 .PHONY: test
 test:
 	$(GOTEST) -race ./...
+
+.PHONY: cover
+cover:
+	$(GOTEST) -race -cover ./...
 
 .PHONY: clean
 clean:

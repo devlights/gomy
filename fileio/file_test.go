@@ -2,7 +2,7 @@ package fileio
 
 import (
 	"bufio"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -72,7 +72,7 @@ func TestOpenRead(t *testing.T) {
 			//noinspection GoUnhandledErrorResult
 			defer releaseFn()
 
-			all, ioErr := ioutil.ReadAll(reader)
+			all, ioErr := io.ReadAll(reader)
 			if ioErr != nil {
 				t.Error(ioErr)
 			}
@@ -153,7 +153,7 @@ func TestOpenWrite(t *testing.T) {
 			//noinspection GoUnhandledErrorResult
 			defer f()
 
-			all, _ := ioutil.ReadAll(reader)
+			all, _ := io.ReadAll(reader)
 
 			data := string(all)
 			if data != c.out.want {
@@ -231,7 +231,7 @@ func TestOpenAppend(t *testing.T) {
 			//noinspection GoUnhandledErrorResult
 			defer f()
 
-			all, _ := ioutil.ReadAll(reader)
+			all, _ := io.ReadAll(reader)
 
 			data := string(all)
 			if data != c.out.want {
@@ -246,7 +246,7 @@ func teardown(s *setupInfo) {
 }
 
 func setup() (*setupInfo, error) {
-	dir, err := ioutil.TempDir("", "gomy")
+	dir, err := os.MkdirTemp("", "gomy")
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func setup() (*setupInfo, error) {
 
 func writeSjisFile(dir string) (string, error) {
 
-	file, err := ioutil.TempFile(dir, "gomy-sjis")
+	file, err := os.CreateTemp(dir, "gomy-sjis")
 	if err != nil {
 		return "", err
 	}
@@ -295,7 +295,7 @@ func writeSjisFile(dir string) (string, error) {
 }
 
 func writeEucJpFile(dir string) (string, error) {
-	file, err := ioutil.TempFile(dir, "gomy-eucjp")
+	file, err := os.CreateTemp(dir, "gomy-eucjp")
 	if err != nil {
 		return "", err
 	}

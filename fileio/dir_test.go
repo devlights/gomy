@@ -1,7 +1,6 @@
 package fileio
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,7 +28,7 @@ func TestReadDir(t *testing.T) {
 		{
 			name: "current dir",
 			in:   testin{dirpath: "."},
-			out:  testout{getFileList(absDirPath)},
+			out:  testout{files(absDirPath)},
 		},
 	}
 
@@ -57,12 +56,12 @@ func TestReadDir(t *testing.T) {
 	}
 }
 
-func getFileList(p string) []string {
-	r := make([]string, 0, 0)
+func files(p string) []string {
+	r := make([]string, 0)
 
-	files, _ := ioutil.ReadDir(p)
-	for _, fi := range files {
-		r = append(r, filepath.Join(p, fi.Name()))
+	entries, _ := os.ReadDir(p)
+	for _, e := range entries {
+		r = append(r, filepath.Join(p, e.Name()))
 	}
 
 	return r
