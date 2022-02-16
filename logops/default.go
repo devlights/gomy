@@ -1,7 +1,7 @@
 package logops
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 )
@@ -28,7 +28,7 @@ var (
 //
 // appLog は標準出力、errLog は標準エラー出力が設定されています。
 //
-// dbgLog はデバッグログ扱いで、引数 debug の値がtrue の場合は標準出力、false の場合は、ioutil.Discard が設定されます。
+// dbgLog はデバッグログ扱いで、引数 debug の値がtrue の場合は標準出力、false の場合は、io.Discard が設定されます。
 //
 // ロガーの調整をしたい場合は、引数 options を指定します。
 func (defaultLogFactory) Logger(debug bool, options ...LoggerOption) (appLog, errLog, dbgLog *log.Logger) {
@@ -42,7 +42,7 @@ func (defaultLogFactory) Logger(debug bool, options ...LoggerOption) (appLog, er
 	}
 
 	if !debug {
-		dbgLog.SetOutput(ioutil.Discard)
+		dbgLog.SetOutput(io.Discard)
 	}
 
 	return

@@ -1,7 +1,6 @@
 package fileio
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -14,11 +13,11 @@ type (
 	}
 )
 
-// ReadDir -- ioutil.ReadDir() の 結果に追加情報を付与したデータを返します.
+// ReadDir -- os.ReadDir() の 結果に追加情報を付与したデータを返します.
 //
-// 動作仕様は ioutil.ReadDir() と同じです.
+// 動作仕様は os.ReadDir() と同じです.
 func ReadDir(dirPath string) ([]FileInfoEx, error) {
-	files, err := ioutil.ReadDir(dirPath)
+	entries, err := os.ReadDir(dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +27,13 @@ func ReadDir(dirPath string) ([]FileInfoEx, error) {
 		return nil, err
 	}
 
-	result := make([]FileInfoEx, 0, len(files))
-	for _, fi := range files {
+	result := make([]FileInfoEx, 0, len(entries))
+	for _, entry := range entries {
+		fi, err := entry.Info()
+		if err != nil {
+			return result, err
+		}
+
 		fiEx := FileInfoEx{
 			FileInfo: fi,
 			FullPath: filepath.Join(absPath, fi.Name()),
