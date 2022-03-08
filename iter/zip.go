@@ -28,8 +28,7 @@ func Zip(a, b []interface{}) []ZipItem {
 	}
 
 	for i := 0; i < length; i++ {
-		item := ZipItem{a[i], b[i]}
-		result = append(result, item)
+		result = append(result, ZipItem{a[i], b[i]})
 	}
 
 	return result
