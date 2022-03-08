@@ -7,3 +7,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/devlights/gomy)](https://goreportcard.com/report/github.com/devlights/gomy)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/devlights/gomy)](https://pkg.go.dev/github.com/devlights/gomy)
 ![Go](https://github.com/devlights/gomy/workflows/Go/badge.svg?branch=master)
+
+```sh
+$ go version
+go version go1.17.5 linux/amd64
+```
