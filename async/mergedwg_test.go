@@ -59,7 +59,7 @@ func TestMergedWaitGroup(t *testing.T) {
 
 	for caseIndex, c := range cases {
 		func() {
-			wgList := make([]*sync.WaitGroup, 0, 0)
+			wgList := make([]*sync.WaitGroup, 0)
 
 			for i := 0; i < c.in.wgCount; i++ {
 				wg := sync.WaitGroup{}
