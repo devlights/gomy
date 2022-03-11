@@ -15,7 +15,7 @@ func run(r io.Reader, w io.Writer, length int) error {
 		count, err := r.Read(buf)
 		if err != nil {
 			if err != io.EOF {
-				return fmt.Errorf("[ERR] Error while reading the record at %d(%v)\n", i, err)
+				return fmt.Errorf("[ERR] Error while reading the record at %d(%v)", i, err)
 			}
 			break
 		}

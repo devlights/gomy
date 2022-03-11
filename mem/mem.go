@@ -161,8 +161,3 @@ func (m *runtimeMem) Print(prefix string) {
 func toKb(bytes uint64) string {
 	return fmt.Sprintf("%d KiB", bytes/1024)
 }
-
-//noinspection GoUnusedFunction
-func toMb(bytes uint64) string {
-	return fmt.Sprintf("%d MiB", bytes/1024/1024)
-}
