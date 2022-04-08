@@ -10,5 +10,5 @@
 
 ```sh
 $ go version
-go version go1.17.5 linux/amd64
+go version go1.18 linux/amd64
 ```
