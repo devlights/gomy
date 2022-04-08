@@ -1,4 +1,4 @@
-image: gitpod/workspace-go:latest
-
+image:
+  file: .gitpod.Dockerfile
 tasks:
   - command: make build
