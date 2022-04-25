@@ -19,7 +19,7 @@ func ExampleBridge() {
 	defer mainCxl()
 	defer procCxl()
 
-	chSeq := make(chan (<-chan interface{}))
+	chSeq := make(chan (<-chan int))
 	go func() {
 		defer close(chSeq)
 		chSeq <- chans.Generator(procCtx.Done(), 1, 2, 3)
@@ -168,10 +168,8 @@ func ExampleEnumerate() {
 	numbers := chans.Generator(procCtx.Done(), 9, 8, 7)
 	values := chans.Enumerate(procCtx.Done(), numbers)
 
-	for e := range values {
-		if v, ok := e.(*chans.IterValue); ok {
-			fmt.Printf("%d:%v\n", v.Index, v.Value)
-		}
+	for v := range values {
+		fmt.Printf("%d:%v\n", v.Index, v.Value)
 	}
 
 	// Output:
@@ -218,7 +216,7 @@ func ExampleFanOut() {
 
 	var (
 		nums     = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5, 6)
-		callback = func(v interface{}) { fmt.Println(v) }
+		callback = func(v int) { fmt.Println(v) }
 	)
 
 	dones := chans.FanOut(procCtx.Done(), nums, 3, callback)
@@ -245,7 +243,7 @@ func ExampleFanOutWg() {
 
 	var (
 		nums     = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5, 6)
-		callback = func(v interface{}) { fmt.Println(v) }
+		callback = func(v int) { fmt.Println(v) }
 	)
 
 	wg := chans.FanOutWg(procCtx.Done(), nums, 3, callback)
@@ -272,11 +270,8 @@ func ExampleFilter() {
 
 	var (
 		numbers   = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
-		predicate = func(v interface{}) bool {
-			if i, ok := v.(int); ok {
-				return i%2 == 0
-			}
-			return false
+		predicate = func(v int) bool {
+			return v%2 == 0
 		}
 	)
 
@@ -500,18 +495,13 @@ func ExampleMap() {
 
 	var (
 		numbers = chans.Generator(procCtx.Done(), 1, 2, 3)
-		fn      = func(original interface{}) (after interface{}) {
-			if i, ok := original.(int); ok {
-				return i * 2
-			}
-			return nil
+		fn      = func(original int) (after int) {
+			return original * 2
 		}
 	)
 
 	for v := range chans.Map(procCtx.Done(), numbers, fn) {
-		if m, ok := v.(*chans.MapValue); ok {
-			fmt.Printf("%v,%v\n", m.Before, m.After)
-		}
+		fmt.Printf("%v,%v\n", v.Before, v.After)
 	}
 
 	// Output:
@@ -701,7 +691,7 @@ func ExampleSkipWhileFn() {
 	defer procCxl()
 
 	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 5)
-	items := chans.SkipWhileFn(procCtx.Done(), numbers, func() interface{} { return 1 })
+	items := chans.SkipWhileFn(procCtx.Done(), numbers, func() int { return 1 })
 
 	for v := range items {
 		fmt.Println(v)
@@ -813,7 +803,7 @@ func ExampleTakeWhileFn() {
 	defer procCxl()
 
 	numbers := chans.ForEach(procCtx.Done(), 1, 1, 1, 4, 1)
-	takes := chans.TakeWhileFn(procCtx.Done(), numbers, func() interface{} { return 1 })
+	takes := chans.TakeWhileFn(procCtx.Done(), numbers, func() int { return 1 })
 
 	for v := range takes {
 		fmt.Println(v)
@@ -839,9 +829,9 @@ func ExampleTee() {
 	ch1, ch2 := chans.Tee(procCtx.Done(), numbers)
 
 	var wg sync.WaitGroup
-	for _, ch := range []<-chan interface{}{ch1, ch2} {
+	for _, ch := range []<-chan int{ch1, ch2} {
 		wg.Add(1)
-		go func(ch <-chan interface{}) {
+		go func(ch <-chan int) {
 			defer wg.Done()
 			for v := range ch {
 				fmt.Println(v)
@@ -867,8 +857,8 @@ func ExampleToInt() {
 	defer procCxl()
 
 	var (
-		gens <-chan interface{} = chans.Generator(procCtx.Done(), 1, 2)
-		ints <-chan int         = chans.ToInt(procCtx.Done(), gens, -1)
+		gens <-chan int = chans.Generator(procCtx.Done(), 1, 2)
+		ints <-chan int = chans.ToInt(procCtx.Done(), gens, -1)
 	)
 
 	for v := range ints {
@@ -891,8 +881,8 @@ func ExampleToString() {
 	defer procCxl()
 
 	var (
-		gens <-chan interface{} = chans.Generator(procCtx.Done(), "hello", "world")
-		strs <-chan string      = chans.ToString(procCtx.Done(), gens, "")
+		gens <-chan string = chans.Generator(procCtx.Done(), "hello", "world")
+		strs <-chan string = chans.ToString(procCtx.Done(), gens, "")
 	)
 
 	for v := range strs {

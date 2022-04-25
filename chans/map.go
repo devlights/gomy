@@ -2,17 +2,17 @@ package chans
 
 type (
 	// MapFunc -- chans.Map にて利用されるチャネルの各要素に適用する関数です。
-	MapFunc func(interface{}) interface{}
+	MapFunc[T any] func(T) T
 
 	// MapValue -- chans.Map にて利用されるデータ型です。
-	MapValue struct {
-		Before interface{} // 元の値
-		After  interface{} // 適用後の値
+	MapValue[T any] struct {
+		Before T // 元の値
+		After  T // 適用後の値
 	}
 )
 
-func newMapValue(before, after interface{}) *MapValue {
-	return &MapValue{
+func newMapValue[T any](before, after T) *MapValue[T] {
+	return &MapValue[T]{
 		Before: before,
 		After:  after,
 	}
@@ -22,14 +22,12 @@ func newMapValue(before, after interface{}) *MapValue {
 //
 // 戻り値のチャネルから取得できるデータ型は、*chans.MapValue となっています。
 //
-// 		for m := range chans.Map(done, inCh, fn) {
-// 			if v, ok := m.(*chans.MapValue); ok {
-// 				// v.Before で元の値、 v.After で適用後の値が取得できる
-// 			}
+// 		for v := range chans.Map(done, inCh, fn) {
+// 			// v.Before で元の値、 v.After で適用後の値が取得できる
 // 		}
 //
-func Map(done <-chan struct{}, in <-chan interface{}, fn MapFunc) <-chan interface{} {
-	out := make(chan interface{})
+func Map[T any](done <-chan struct{}, in <-chan T, fn MapFunc[T]) <-chan *MapValue[T] {
+	out := make(chan *MapValue[T])
 
 	go func() {
 		defer close(out)

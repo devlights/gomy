@@ -5,7 +5,7 @@ import "time"
 // Chain -- 指定された base チャネルがクローズした後に next で指定された関数を呼び出します.
 //
 // done チャネルがクローズした場合、 next は実行されません。
-func Chain(done, base <-chan struct{}, next func(finishedTime time.Time)) <-chan struct{} {
+func Chain(done, base <-chan struct{}, next func(finished time.Time)) <-chan struct{} {
 	ch := make(chan struct{})
 
 	go func() {

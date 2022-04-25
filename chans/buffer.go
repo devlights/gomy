@@ -1,14 +1,14 @@
 package chans
 
 // Buffer は、入力を指定した件数分に束ねてデータを返すチャネルを生成します.
-func Buffer(done <-chan struct{}, in <-chan interface{}, count int) <-chan []interface{} {
-	out := make(chan []interface{})
+func Buffer[T any](done <-chan struct{}, in <-chan T, count int) <-chan []T {
+	out := make(chan []T)
 
 	go func() {
 		defer close(out)
 
 		for {
-			items := make([]interface{}, 0, count)
+			items := make([]T, 0, count)
 			for item := range Take(done, in, count) {
 				items = append(items, item)
 			}

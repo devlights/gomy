@@ -3,9 +3,9 @@ package chans
 // Tee -- Unix の tee コマンドのように一つの入力を２つに複製するチャネルを返します。
 //
 // noinspection GoNilness
-func Tee(done <-chan struct{}, in <-chan interface{}) (<-chan interface{}, <-chan interface{}) {
-	out1 := make(chan interface{})
-	out2 := make(chan interface{})
+func Tee[T any](done <-chan struct{}, in <-chan T) (<-chan T, <-chan T) {
+	out1 := make(chan T)
+	out2 := make(chan T)
 
 	go func() {
 		defer close(out1)

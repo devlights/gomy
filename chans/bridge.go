@@ -1,14 +1,14 @@
 package chans
 
 // Bridge -- 指定されたチャネルのシーケンスを順に消費していく単一のチャネルを返します。
-func Bridge(done <-chan struct{}, chanCh <-chan <-chan interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func Bridge[T any](done <-chan struct{}, chanCh <-chan <-chan T) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)
 
 		for {
-			var ch <-chan interface{}
+			var ch <-chan T
 			select {
 			case c, ok := <-chanCh:
 				if !ok {

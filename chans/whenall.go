@@ -7,10 +7,10 @@ import (
 // WhenAll -- 指定した１つ以上のチャネルの全てが閉じられたら、閉じるチャネルを返します。
 //
 // チャネルを一つも渡さずに呼び出すと、既に close 済みのチャネルを返します。
-func WhenAll(channels ...<-chan struct{}) <-chan struct{} {
+func WhenAll[T any](channels ...<-chan T) <-chan T {
 	switch len(channels) {
 	case 0:
-		nilCh := make(chan struct{})
+		nilCh := make(chan T)
 		close(nilCh)
 
 		return nilCh
@@ -18,7 +18,7 @@ func WhenAll(channels ...<-chan struct{}) <-chan struct{} {
 		return channels[0]
 	}
 
-	allDone := make(chan struct{})
+	allDone := make(chan T)
 	go func() {
 		defer close(allDone)
 
@@ -26,7 +26,7 @@ func WhenAll(channels ...<-chan struct{}) <-chan struct{} {
 		wg.Add(len(channels))
 
 		for _, v := range channels {
-			go func(ch <-chan struct{}) {
+			go func(ch <-chan T) {
 				defer wg.Done()
 				<-ch
 			}(v)
