@@ -2,10 +2,30 @@ package chans_test
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
 )
+
+func TestConvert(t *testing.T) {
+	var (
+		done = make(chan struct{})
+		in   = chans.Generator(done, 1, 2, 3, 4, 5)
+		out  = []string{"1", "2", "3", "4", "5"}
+		fn   = func(i int) string { return strconv.Itoa(i) }
+	)
+	defer close(done)
+
+	results := make([]string, 0)
+	for v := range chans.Convert(done, in, fn) {
+		results = append(results, v)
+	}
+
+	if !reflect.DeepEqual(out, results) {
+		t.Errorf("[want] %v\t[got] %v\n", out, results)
+	}
+}
 
 func TestToString(t *testing.T) {
 	type (
