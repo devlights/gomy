@@ -1,8 +1,8 @@
 package chans
 
 // Take -- 指定した個数分、入力用チャネルから値を取得するチャネルを返します。
-func Take(done <-chan struct{}, in <-chan interface{}, count int) <-chan interface{} {
-	out := make(chan interface{})
+func Take[T any](done <-chan struct{}, in <-chan T, count int) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)
@@ -28,15 +28,15 @@ func Take(done <-chan struct{}, in <-chan interface{}, count int) <-chan interfa
 }
 
 // TakeWhile -- 入力用チャネルから取得した値が指定した値と同一である間、値を取得し続けるチャネルを返します。
-func TakeWhile(done <-chan struct{}, in <-chan interface{}, value interface{}) <-chan interface{} {
-	return TakeWhileFn(done, in, func() interface{} { return value })
+func TakeWhile[T comparable](done <-chan struct{}, in <-chan T, value T) <-chan T {
+	return TakeWhileFn(done, in, func() T { return value })
 }
 
 // TakeWhileFn -- 入力用チャネルから取得した値が指定した関数の戻り値と同一である間、値を取得し続けるチャネルを返します。
-func TakeWhileFn(done <-chan struct{}, in <-chan interface{}, fn func() interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func TakeWhileFn[T comparable](done <-chan struct{}, in <-chan T, fn func() T) <-chan T {
+	out := make(chan T)
 
-	go func(fn func() interface{}) {
+	go func(fn func() T) {
 		defer close(out)
 
 		r := fn()

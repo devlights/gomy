@@ -3,10 +3,10 @@ package chans
 // WhenAny -- 指定した１つ以上のチャネルのどれかが１つが閉じられたら、閉じるチャネルを返します。
 //
 // チャネルを一つも渡さずに呼び出すと、既に close 済みのチャネルを返します。
-func WhenAny(channels ...<-chan struct{}) <-chan struct{} {
+func WhenAny[T any](channels ...<-chan T) <-chan T {
 	switch len(channels) {
 	case 0:
-		nilCh := make(chan struct{})
+		nilCh := make(chan T)
 		close(nilCh)
 
 		return nilCh
@@ -14,7 +14,7 @@ func WhenAny(channels ...<-chan struct{}) <-chan struct{} {
 		return channels[0]
 	}
 
-	orDone := make(chan struct{})
+	orDone := make(chan T)
 	go func() {
 		defer close(orDone)
 

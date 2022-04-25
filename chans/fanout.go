@@ -7,7 +7,7 @@ import (
 // FanOut -- 指定されたチャネルの処理を指定されたワーカーの数でファンアウトします。
 //
 // チャネルからデータを取得するたびに引数 callback が呼ばれます。
-func FanOut(done <-chan struct{}, in <-chan interface{}, workerCount int, callback func(interface{})) []<-chan struct{} {
+func FanOut[T any](done <-chan struct{}, in <-chan T, workerCount int, callback func(T)) []<-chan struct{} {
 	outChList := make([]<-chan struct{}, 0)
 
 	for i := 0; i < workerCount; i++ {
@@ -34,7 +34,7 @@ func FanOut(done <-chan struct{}, in <-chan interface{}, workerCount int, callba
 }
 
 // FanOutWg -- FanOut() の sync.WaitGroup を返す版です。
-func FanOutWg(done <-chan struct{}, in <-chan interface{}, workerCount int, callback func(interface{})) *sync.WaitGroup {
+func FanOutWg[T any](done <-chan struct{}, in <-chan T, workerCount int, callback func(T)) *sync.WaitGroup {
 	wg := sync.WaitGroup{}
 
 	for i := 0; i < workerCount; i++ {

@@ -141,7 +141,7 @@ func TestTakeWhile(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			inCh := make(chan interface{}, len(c.in.data))
+			inCh := make(chan int, len(c.in.data))
 			func() {
 				defer close(inCh)
 
@@ -167,7 +167,7 @@ func TestTakeWhile(t *testing.T) {
 func TestTakeWhileFn(t *testing.T) {
 	type (
 		testin struct {
-			fn   func() interface{}
+			fn   func() int
 			data []int
 		}
 		testout struct {
@@ -185,7 +185,7 @@ func TestTakeWhileFn(t *testing.T) {
 			name: "1-only",
 			in: testin{
 				data: []int{1},
-				fn:   func() interface{} { return 1 },
+				fn:   func() int { return 1 },
 			},
 			out: testout{count: 1},
 		},
@@ -193,7 +193,7 @@ func TestTakeWhileFn(t *testing.T) {
 			name: "1, 1, 1, 1, 1, 2, 2",
 			in: testin{
 				data: []int{1, 1, 1, 1, 1, 2, 2},
-				fn:   func() interface{} { return 1 },
+				fn:   func() int { return 1 },
 			},
 			out: testout{count: 5},
 		},
@@ -201,7 +201,7 @@ func TestTakeWhileFn(t *testing.T) {
 			name: "1, 1, 2, 1, 1, 2, 2",
 			in: testin{
 				data: []int{1, 1, 2, 1, 1, 2, 2},
-				fn:   func() interface{} { return 1 },
+				fn:   func() int { return 1 },
 			},
 			out: testout{count: 2},
 		},
@@ -212,7 +212,7 @@ func TestTakeWhileFn(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			inCh := make(chan interface{}, len(c.in.data))
+			inCh := make(chan int, len(c.in.data))
 			func() {
 				defer close(inCh)
 

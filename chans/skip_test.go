@@ -125,7 +125,7 @@ func TestSkipWhile(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			inCh := make(chan interface{}, len(c.in.data))
+			inCh := make(chan int, len(c.in.data))
 			func() {
 				defer close(inCh)
 
@@ -152,7 +152,7 @@ func TestSkipWhile(t *testing.T) {
 func TestSkipWhileFn(t *testing.T) {
 	type (
 		testin struct {
-			fn   func() interface{}
+			fn   func() int
 			data []int
 		}
 		testout struct {
@@ -168,21 +168,21 @@ func TestSkipWhileFn(t *testing.T) {
 		{
 			in: testin{
 				data: []int{1},
-				fn:   func() interface{} { return 1 },
+				fn:   func() int { return 1 },
 			},
 			out: testout{count: 0},
 		},
 		{
 			in: testin{
 				data: []int{1, 1, 1, 1, 1, 2, 2},
-				fn:   func() interface{} { return 1 },
+				fn:   func() int { return 1 },
 			},
 			out: testout{count: 2},
 		},
 		{
 			in: testin{
 				data: []int{1, 1, 2, 1, 1, 2, 2},
-				fn:   func() interface{} { return 1 },
+				fn:   func() int { return 1 },
 			},
 			out: testout{count: 5},
 		},
@@ -193,7 +193,7 @@ func TestSkipWhileFn(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			inCh := make(chan interface{}, len(c.in.data))
+			inCh := make(chan int, len(c.in.data))
 			func() {
 				defer close(inCh)
 

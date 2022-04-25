@@ -1,8 +1,8 @@
 package chans
 
 // Skip -- 指定した個数分、入力用チャネルから値をスキップするチャネルを返します。
-func Skip(done <-chan struct{}, in <-chan interface{}, count int) <-chan interface{} {
-	out := make(chan interface{})
+func Skip[T any](done <-chan struct{}, in <-chan T, count int) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)
@@ -25,15 +25,15 @@ func Skip(done <-chan struct{}, in <-chan interface{}, count int) <-chan interfa
 }
 
 // SkipWhile -- 入力用チャネルから取得した値が指定した値と同一である間、値をスキップし続けるチャネルを返します。
-func SkipWhile(done <-chan struct{}, in <-chan interface{}, value interface{}) <-chan interface{} {
-	return SkipWhileFn(done, in, func() interface{} { return value })
+func SkipWhile[T comparable](done <-chan struct{}, in <-chan T, value T) <-chan T {
+	return SkipWhileFn(done, in, func() T { return value })
 }
 
 // SkipWhileFn -- 入力用チャネルから取得した値が指定した関数の戻り値と同一である間、値をスキップし続けるチャネルを返します。
-func SkipWhileFn(done <-chan struct{}, in <-chan interface{}, fn func() interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func SkipWhileFn[T comparable](done <-chan struct{}, in <-chan T, fn func() T) <-chan T {
+	out := make(chan T)
 
-	go func(fn func() interface{}) {
+	go func(fn func() T) {
 		defer close(out)
 
 		var (

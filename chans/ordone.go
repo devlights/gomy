@@ -1,8 +1,8 @@
 package chans
 
 // OrDone -- 指定された終了チャネルと入力用チャネルのどちらかが閉じたら閉じるチャネルを返します。
-func OrDone(done <-chan struct{}, in <-chan interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func OrDone[T any](done <-chan struct{}, in <-chan T) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)

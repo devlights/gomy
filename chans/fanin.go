@@ -1,15 +1,15 @@
 package chans
 
 // FanIn -- 指定されたチャネルリストをファンインするチャネルを返します。
-func FanIn(done <-chan struct{}, channels ...<-chan interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func FanIn[T any](done <-chan struct{}, channels ...<-chan T) <-chan T {
+	out := make(chan T)
 
 	chList := make([]<-chan struct{}, 0)
 	for _, in := range channels {
 		chList = append(chList, func() <-chan struct{} {
 			terminated := make(chan struct{})
 
-			go func(in <-chan interface{}) {
+			go func(in <-chan T) {
 				defer close(terminated)
 
 				for v := range in {

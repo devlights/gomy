@@ -11,11 +11,11 @@ import (
 func TestMap(t *testing.T) {
 	type (
 		testin struct {
-			input []interface{}
-			fn    chans.MapFunc
+			input []string
+			fn    chans.MapFunc[string]
 		}
 		testout struct {
-			result []interface{}
+			result []string
 		}
 		testcase struct {
 			in  testin
@@ -26,12 +26,12 @@ func TestMap(t *testing.T) {
 	cases := []testcase{
 		{
 			in: testin{
-				input: []interface{}{"hello", "world"},
-				fn: func(v interface{}) interface{} {
-					return strings.ToUpper(v.(string))
+				input: []string{"hello", "world"},
+				fn: func(v string) string {
+					return strings.ToUpper(v)
 				},
 			},
-			out: testout{result: []interface{}{"HELLO", "WORLD"}},
+			out: testout{result: []string{"HELLO", "WORLD"}},
 		},
 	}
 
@@ -40,13 +40,10 @@ func TestMap(t *testing.T) {
 			done := make(chan struct{})
 			defer close(done)
 
-			results := make([]interface{}, 0)
-			for m := range chans.Map(done, chans.ForEach(done, c.in.input...), c.in.fn) {
-
-				if v, ok := m.(*chans.MapValue); ok {
-					t.Logf("[test-%02d] [%v] ==> [%v]", caseIndex, v.Before, v.After)
-					results = append(results, v.After)
-				}
+			results := make([]string, 0)
+			for v := range chans.Map(done, chans.ForEach(done, c.in.input...), c.in.fn) {
+				t.Logf("[test-%02d] [%v] ==> [%v]", caseIndex, v.Before, v.After)
+				results = append(results, v.After)
 			}
 
 			if !reflect.DeepEqual(c.out.result, results) {

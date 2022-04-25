@@ -1,8 +1,8 @@
 package chans
 
 // Repeat -- 指定した値を永遠と繰り返すチャネルを返します。
-func Repeat(done <-chan struct{}, values ...interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func Repeat[T any](done <-chan struct{}, values ...T) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)
@@ -22,8 +22,8 @@ func Repeat(done <-chan struct{}, values ...interface{}) <-chan interface{} {
 }
 
 // RepeatFn -- 指定した関数を永遠と繰り返し、その戻り値を返すチャネルを返します。
-func RepeatFn(done <-chan struct{}, fn func() interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func RepeatFn[T any](done <-chan struct{}, fn func() T) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)

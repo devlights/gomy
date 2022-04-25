@@ -2,14 +2,14 @@ package chans
 
 type (
 	// IterValue -- chans.Enumerate() にて利用されるデータ型です。
-	IterValue struct {
-		Index int         // インデックス
-		Value interface{} // 値
+	IterValue[T any] struct {
+		Index int // インデックス
+		Value T   // 値
 	}
 )
 
-func newIterValue(i int, v interface{}) *IterValue {
-	return &IterValue{
+func newIterValue[T any](i int, v T) *IterValue[T] {
+	return &IterValue[T]{
 		Index: i,
 		Value: v,
 	}
@@ -19,14 +19,12 @@ func newIterValue(i int, v interface{}) *IterValue {
 //
 // 戻り値のチャネルから取得できるデータ型は、*chans.IterValue となっています。
 //
-// 		for e := range chans.Enumerate(done, inCh) {
-// 			if v, ok := e.(*IterValue); ok {
-// 				// v.Index でインデックス、 v.Value で値が取得できる
-// 			}
+// 		for v := range chans.Enumerate(done, inCh) {
+// 			// v.Index でインデックス、 v.Value で値が取得できる
 // 		}
 //
-func Enumerate(done <-chan struct{}, in <-chan interface{}) <-chan interface{} {
-	out := make(chan interface{})
+func Enumerate[T any](done <-chan struct{}, in <-chan T) <-chan *IterValue[T] {
+	out := make(chan *IterValue[T])
 
 	go func() {
 		defer close(out)
