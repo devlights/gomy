@@ -1,10 +1,8 @@
 package chans
 
-// ToString -- 入力用チャネルから値を取得し、文字列に変換するチャネルを返します。
-//
-// 文字列に変換することが出来なかった場合は、引数 failedValue を出力用チャネルに送ります。
-func ToString[T any](done <-chan struct{}, in <-chan T, failedValue string) <-chan string {
-	out := make(chan string)
+// Convert -- 入力用チャネルから値を取得し変換するチャネルを返します。
+func Convert[F any, T any](done <-chan struct{}, in <-chan F, fn func(F) T) <-chan T {
+	out := make(chan T)
 
 	go func() {
 		defer close(out)
@@ -18,13 +16,8 @@ func ToString[T any](done <-chan struct{}, in <-chan T, failedValue string) <-ch
 					return
 				}
 
-				s, ok := any(v).(string)
-				if !ok {
-					s = failedValue
-				}
-
 				select {
-				case out <- s:
+				case out <- fn(v):
 				case <-done:
 				}
 			}
@@ -34,38 +27,30 @@ func ToString[T any](done <-chan struct{}, in <-chan T, failedValue string) <-ch
 	return out
 }
 
+// ToString -- 入力用チャネルから値を取得し、文字列に変換するチャネルを返します。
+//
+// 文字列に変換することが出来なかった場合は、引数 failedValue を出力用チャネルに送ります。
+func ToString[T any](done <-chan struct{}, in <-chan T, failedValue string) <-chan string {
+	return Convert(done, in, func(v T) string {
+		s, ok := any(v).(string)
+		if !ok {
+			return failedValue
+		}
+		return s
+	})
+}
+
 // ToInt -- 入力用チャネルから値を取得し、数値に変換するチャネルを返します。
 //
 // 数値に変換することが出来なかった場合は、引数 failedValue を出力用チャネルに送ります。
 func ToInt[T any](done <-chan struct{}, in <-chan T, failedValue int) <-chan int {
-	out := make(chan int)
-
-	go func() {
-		defer close(out)
-
-		for {
-			select {
-			case <-done:
-				return
-			case v, ok := <-in:
-				if !ok {
-					return
-				}
-
-				s, ok := any(v).(int)
-				if !ok {
-					s = failedValue
-				}
-
-				select {
-				case out <- s:
-				case <-done:
-				}
-			}
+	return Convert(done, in, func(v T) int {
+		i, ok := any(v).(int)
+		if !ok {
+			return failedValue
 		}
-	}()
-
-	return out
+		return i
+	})
 }
 
 // FromIntCh -- chan int を chan any に変換します。

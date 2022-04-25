@@ -3,6 +3,7 @@ package chans_test
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -153,6 +154,31 @@ func ExampleConcat() {
 	// 4
 	// 5
 	// 6
+}
+
+func ExampleConvert() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
+	)
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		done      = procCtx.Done()
+		numbers   = chans.Generator(done, 1, 2, 3)
+		converted = chans.Convert(done, numbers, func(v int) string { return strconv.Itoa(v) })
+	)
+
+	for v := range converted {
+		fmt.Printf("[%T]%q\n", v, v)
+	}
+
+	// Output:
+	// [string]"1"
+	// [string]"2"
+	// [string]"3"
 }
 
 func ExampleEnumerate() {
