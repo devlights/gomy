@@ -1,10 +1,8 @@
-package errs_test
+package errs
 
 import (
 	"errors"
 	"testing"
-
-	"github.com/devlights/gomy/errs"
 )
 
 func TestForgot(t *testing.T) {
@@ -17,12 +15,12 @@ func TestForgot(t *testing.T) {
 		}
 	)
 
-	v := errs.Forgot(fn1())
+	v := Forgot(fn1())
 	if v != "hello" {
 		t.Errorf("[want] %s\t[got] %s", "hello", v)
 	}
 
-	v2 := errs.Forgot(fn2())
+	v2 := Forgot(fn2())
 	if v2 != 100 {
 		t.Errorf("[want] %d\t[got] %d", 100, v2)
 	}
