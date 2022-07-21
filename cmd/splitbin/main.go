@@ -11,7 +11,7 @@ import (
 func run(r io.Reader, w io.Writer, length int) error {
 	for i := 1; ; i++ {
 		buf := make([]byte, length)
-		
+
 		count, err := r.Read(buf)
 		if err != nil {
 			if err != io.EOF {

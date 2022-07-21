@@ -15,7 +15,7 @@ tasks:
     cmds:
       - go test ./...
   cover:
-    desc: Test and cover:
+    desc: Test and covergit
     cmds:
       - go test -cover ./...
   vet:
