@@ -1,0 +1,29 @@
+# https://github.com/go-task/task
+version: '3'
+
+tasks:
+  default:
+    desc: Default (run)
+    deps:
+      - task: test
+  build:
+    desc: Build app
+    cmds:
+      - go build -race ./...
+  test:
+    desc: Test
+    cmds:
+      - go test ./...
+  cover:
+    desc: Test and cover:
+    cmds:
+      - go test -cover ./...
+  vet:
+    desc: go vet and staticcheck
+    cmds:
+      - go vet ./...
+      - staticcheck ./...
+  fmt:
+    desc: go fmt
+    cmds:
+      - go fmt ./...
