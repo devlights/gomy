@@ -25,11 +25,11 @@ func TestHas(t *testing.T) {
 
 	// Assert
 	if result1 {
-		t.Error("fail result1")
+		t.Error("sut has Bit1")
 	}
 
 	if !result2 {
-		t.Error("fail result2")
+		t.Error("sut does not have Bit2")
 	}
 }
 
@@ -59,7 +59,7 @@ func TestSetEmpty(t *testing.T) {
 
 	// Assert
 	if !bitflags.Has(sut, Bit1) {
-		t.Error("sut does not have Bit2")
+		t.Error("sut does not have Bit1")
 	}
 }
 
