@@ -83,6 +83,7 @@ func TestForce(t *testing.T) {
 func TestUnset(t *testing.T) {
 	// Arrange
 	sut := Bit2
+	bitflags.Set(&sut, Bit8)
 
 	// Act
 	bitflags.Unset(&sut, Bit2)
@@ -90,5 +91,9 @@ func TestUnset(t *testing.T) {
 	// Assert
 	if bitflags.Has(sut, Bit2) {
 		t.Error("sut has Bit2")
+	}
+
+	if !bitflags.Has(sut, Bit8) {
+		t.Error("sut does not have Bit8")
 	}
 }
