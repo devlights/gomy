@@ -16,7 +16,7 @@ var (
 // Reference: https://github.com/go101/go101/blob/8760586e110316dcfaad36ff167f67b4f09de0a7/go101.go#L430
 func OpenBrowser(url string) error {
 	var (
-		cmd string
+		cmd  string
 		args []string
 	)
 

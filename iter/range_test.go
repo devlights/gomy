@@ -95,7 +95,7 @@ func TestRangeFn(t *testing.T) {
 			if ri != c.outi {
 				t.Errorf("[want] %v\t[got] %v", c.outi, ri)
 			}
-			
+
 			if err != c.oute {
 				t.Errorf("[want] %v\t[got] %v", c.oute, err)
 			}
