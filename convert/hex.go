@@ -14,8 +14,8 @@ import (
 //
 // - prefixを指定した場合、変換後の文字列の先頭に付与します.
 //
-// - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
-//   (e.g. length=4 で 16進数 FF を指定した場合 0255 となります.)
+//   - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
+//     (e.g. length=4 で 16進数 FF を指定した場合 0255 となります.)
 func Hex2Dec(val string, prefix string, length int) (string, error) {
 	if val == "" {
 		return "", nil

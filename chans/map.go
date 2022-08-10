@@ -22,10 +22,9 @@ func newMapValue[T any](before, after T) *MapValue[T] {
 //
 // 戻り値のチャネルから取得できるデータ型は、*chans.MapValue となっています。
 //
-// 		for v := range chans.Map(done, inCh, fn) {
-// 			// v.Before で元の値、 v.After で適用後の値が取得できる
-// 		}
-//
+//	for v := range chans.Map(done, inCh, fn) {
+//		// v.Before で元の値、 v.After で適用後の値が取得できる
+//	}
 func Map[T any](done <-chan struct{}, in <-chan T, fn MapFunc[T]) <-chan *MapValue[T] {
 	out := make(chan *MapValue[T])
 

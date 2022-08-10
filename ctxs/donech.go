@@ -9,8 +9,7 @@ import "context"
 //
 // Example:
 //
-// 		<-chans.WhenAll(ctxs.ToDoneCh(contexts...)...) // contexts is []context.Context
-//
+//	<-chans.WhenAll(ctxs.ToDoneCh(contexts...)...) // contexts is []context.Context
 func ToDoneCh(contexts ...context.Context) []<-chan struct{} {
 	dones := make([]<-chan struct{}, len(contexts))
 

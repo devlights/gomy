@@ -12,8 +12,7 @@ import (
 //
 // Example:
 //
-// 		<-ctxs.WhenAll(procCtx, ctx1, ctx2, ctx3).Done()
-//
+//	<-ctxs.WhenAll(procCtx, ctx1, ctx2, ctx3).Done()
 func WhenAll(pCtx context.Context, c ...context.Context) context.Context {
 	ctx, cancel := context.WithCancel(pCtx)
 	go func(dones []<-chan struct{}) {

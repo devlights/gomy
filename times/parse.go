@@ -30,18 +30,20 @@ func convLayout(layout string) string {
 // Parse -- 指定されたレイアウトに従って time.Parse() を呼び出します。
 //
 // 指定できる書式は以下です。
-//   yyyy: 年 (4桁)
-//   MM  : 月 (2桁)
-//   dd  : 日 (2桁)
-//   hh  : 時 (2桁)(24h)
-//   mm  : 分 (2桁)
-//   ss  : 秒 (2桁)
-//   fff : ミリ秒 (3桁)
-//   loc : タイムゾーン (+0900などの部分に対応します)
+//
+//	yyyy: 年 (4桁)
+//	MM  : 月 (2桁)
+//	dd  : 日 (2桁)
+//	hh  : 時 (2桁)(24h)
+//	mm  : 分 (2桁)
+//	ss  : 秒 (2桁)
+//	fff : ミリ秒 (3桁)
+//	loc : タイムゾーン (+0900などの部分に対応します)
 //
 // 例
-//   2022-04-28 16:23:45.876 +0900
-//   yyyy-MM-dd hh:mm:ss.fff loc
+//
+//	2022-04-28 16:23:45.876 +0900
+//	yyyy-MM-dd hh:mm:ss.fff loc
 func (me Parser) Parse(layout string) (time.Time, error) {
 	t, err := time.Parse(convLayout(layout), string(me))
 	if err != nil {

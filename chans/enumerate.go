@@ -19,10 +19,9 @@ func newIterValue[T any](i int, v T) *IterValue[T] {
 //
 // 戻り値のチャネルから取得できるデータ型は、*chans.IterValue となっています。
 //
-// 		for v := range chans.Enumerate(done, inCh) {
-// 			// v.Index でインデックス、 v.Value で値が取得できる
-// 		}
-//
+//	for v := range chans.Enumerate(done, inCh) {
+//		// v.Index でインデックス、 v.Value で値が取得できる
+//	}
 func Enumerate[T any](done <-chan struct{}, in <-chan T) <-chan *IterValue[T] {
 	out := make(chan *IterValue[T])
 
