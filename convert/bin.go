@@ -14,8 +14,8 @@ import (
 //
 // - prefixを指定した場合、変換後の文字列の先頭に付与します.
 //
-// - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
-//   (e.g. length=4 で 2進数 1000 を指定した場合 0008 となります.)
+//   - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
+//     (e.g. length=4 で 2進数 1000 を指定した場合 0008 となります.)
 func Bin2Dec(val string, prefix string, length int) (string, error) {
 	if val == "" {
 		return "", nil
@@ -49,8 +49,8 @@ func Bin2Dec(val string, prefix string, length int) (string, error) {
 //
 // - prefixを指定した場合、変換後の文字列の先頭に付与します.
 //
-// - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
-//   (e.g. length=4 で 2進数 1111 を指定した場合 000F となります.)
+//   - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
+//     (e.g. length=4 で 2進数 1111 を指定した場合 000F となります.)
 func Bin2Hex(val string, prefix string, length int) (string, error) {
 	if val == "" {
 		return "", nil

@@ -9,7 +9,7 @@ import (
 // Copy -- ファイルをコピーします。
 //
 // REFERENCES
-//  - https://stackoverflow.com/questions/21060945/simple-way-to-copy-a-file
+//   - https://stackoverflow.com/questions/21060945/simple-way-to-copy-a-file
 func Copy(src, dst string) (err error) {
 	var (
 		in  *os.File

@@ -13,8 +13,8 @@ import (
 //
 // - prefixを指定した場合、変換後の文字列の先頭に付与します.
 //
-// - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
-//   (e.g. length=4 で 10進数 777 を指定した場合 0309 となります.)
+//   - lengthを指定した場合、その長さに合うようにゼロパディングします. 0の場合はパディング無しで変換されます.
+//     (e.g. length=4 で 10進数 777 を指定した場合 0309 となります.)
 func Dec2Hex(val string, prefix string, length int) (string, error) {
 	if val == "" {
 		return "", nil

@@ -5,7 +5,7 @@ type (
 	Encoding int
 )
 
-//noinspection GoUnusedConst
+// noinspection GoUnusedConst
 const (
 	Utf8     Encoding = 0x01 // Utf8
 	ShiftJis Encoding = 0x10 // Shift-JIS
