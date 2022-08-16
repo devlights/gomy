@@ -13,11 +13,11 @@ tasks:
   test:
     desc: Test
     cmds:
-      - go test ./...
+      - go test -count 1 ./...
   cover:
     desc: Test and covergit
     cmds:
-      - go test -cover ./...
+      - go test -count 1 -cover ./...
   vet:
     desc: go vet and staticcheck
     cmds:

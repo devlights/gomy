@@ -2,6 +2,7 @@ package fileio
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"os"
 	"testing"
@@ -238,6 +239,48 @@ func TestOpenAppend(t *testing.T) {
 				t.Errorf("want: %s\tgot %s", c.out.want, data)
 			}
 		}()
+	}
+}
+
+func TestBufReadWrite(t *testing.T) {
+	tests := []struct {
+		in  string
+		enc jp.Encoding
+		out int
+	}{
+		{"helloworld", jp.Utf8, 10},
+		{"こんにちは世界", jp.ShiftJis, 14},
+		{"こんにちは世界", jp.EucJp, 14},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.in, func(t *testing.T) {
+			bufW := &bytes.Buffer{}
+
+			w, err := BufWrite(bufW, tt.enc)
+			if err != nil {
+				t.Error(err)
+			}
+			w.Write([]byte(tt.in))
+
+			bufR := bytes.NewBuffer(bufW.Bytes())
+
+			b, _ := io.ReadAll(bufW)
+			if len(b) != tt.out {
+				t.Errorf("[want] %v\t[got] %v", tt.out, len(b))
+			}
+
+			r, err := BufRead(bufR, tt.enc)
+			if err != nil {
+				t.Error(err)
+			}
+
+			b, _ = io.ReadAll(r)
+			if string(b) != tt.in {
+				t.Errorf("[want] %v\t[got] %v", tt.in, string(b))
+			}
+		})
 	}
 }
 
