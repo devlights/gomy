@@ -1,6 +1,7 @@
 package fileio
 
 import (
+	"bytes"
 	"io"
 	"os"
 
@@ -35,6 +36,26 @@ func OpenAppend(name string, encoding jp.Encoding) (io.Writer, func() error, err
 	)
 
 	return openWriteMode(name, flag, encoding)
+}
+
+// BufRead は、指定されたエンコーディングで読み出しを行う io.Reader を返します。
+func BufRead(buf *bytes.Buffer, enc jp.Encoding) (io.Reader, error) {
+	decoder := getDecoder(enc)
+	if decoder == nil {
+		return buf, nil
+	}
+
+	return transform.NewReader(buf, decoder), nil
+}
+
+// BufWrite は、指定されたエンコーディングで書き出しを行う io.Writer を返します。
+func BufWrite(buf *bytes.Buffer, enc jp.Encoding) (io.Writer, error) {
+	encoder := getEncoder(enc)
+	if encoder == nil {
+		return buf, nil
+	}
+
+	return transform.NewWriter(buf, encoder), nil
 }
 
 func getDecoder(enc jp.Encoding) *encoding.Decoder {
