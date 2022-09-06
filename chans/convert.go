@@ -1,6 +1,13 @@
 package chans
 
-// Convert -- 入力用チャネルから値を取得し変換するチャネルを返します。
+import "context"
+
+// ConvertContext は、 Convert の context.Context 版です.
+func ConvertContext[F any, T any](ctx context.Context, in <-chan F, fn func(F) T) <-chan T {
+	return Convert(ctx.Done(), in, fn)
+}
+
+// Convert は、入力用チャネルから値を取得し変換するチャネルを返します.
 func Convert[F any, T any](done <-chan struct{}, in <-chan F, fn func(F) T) <-chan T {
 	out := make(chan T)
 
