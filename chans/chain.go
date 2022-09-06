@@ -1,6 +1,24 @@
 package chans
 
-import "time"
+import (
+	"context"
+	"time"
+)
+
+// ChainContext -- Chain の context.Context 版です.
+func ChainContext(ctx context.Context, base context.Context, next func(finished time.Time)) context.Context {
+	var (
+		pCtx, pCxl = context.WithCancel(ctx)
+		done       = Chain(ctx.Done(), base.Done(), next)
+	)
+
+	go func() {
+		defer pCxl()
+		<-done
+	}()
+
+	return pCtx
+}
 
 // Chain -- 指定された base チャネルがクローズした後に next で指定された関数を呼び出します.
 //
