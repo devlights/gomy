@@ -1,10 +1,32 @@
 package chans_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
+	"golang.org/x/exp/slices"
 )
+
+func TestFanInContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx    = context.Background()
+		values = []int{1, 2, 3, 4}
+		ch1    = chans.Generator(ctx.Done(), values[0], values[1])
+		ch2    = chans.Generator(ctx.Done(), values[2], values[3])
+	)
+
+	// Act
+	var ret <-chan int = chans.FanInContext(ctx, ch1, ch2)
+
+	// Assert
+	for v := range ret {
+		if !slices.Contains(values, v) {
+			t.Errorf("value %v is not included in %v", v, values)
+		}
+	}
+}
 
 func TestFanIn(t *testing.T) {
 	type (

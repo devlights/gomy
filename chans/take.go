@@ -1,5 +1,22 @@
 package chans
 
+import "context"
+
+// TakeContext は、Take の context.Context 版です.
+func TakeContext[T any](ctx context.Context, in <-chan T, count int) <-chan T {
+	return Take(ctx.Done(), in, count)
+}
+
+// TakeWhileContext は、TakeWhile の context.Context 版です.
+func TakeWhileContext[T comparable](ctx context.Context, in <-chan T, value T) <-chan T {
+	return TakeWhile(ctx.Done(), in, value)
+}
+
+// TakeWhileFnContext は、TakeWhileFn の context.Context 版です.
+func TakeWhileFnContext[T comparable](ctx context.Context, in <-chan T, fn func() T) <-chan T {
+	return TakeWhileFn(ctx.Done(), in, fn)
+}
+
 // Take -- 指定した個数分、入力用チャネルから値を取得するチャネルを返します。
 func Take[T any](done <-chan struct{}, in <-chan T, count int) <-chan T {
 	out := make(chan T)

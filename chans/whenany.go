@@ -1,12 +1,32 @@
 package chans
 
+import "context"
+
+// WhenAnyContext は、WhenAny の context.Context 版です.
+func WhenAnyContext(pCtx context.Context, channels ...<-chan struct{}) context.Context {
+	var (
+		ctx, cxl = context.WithCancel(pCtx)
+		done     = WhenAny(channels...)
+	)
+
+	go func() {
+		defer cxl()
+		select {
+		case <-pCtx.Done():
+		case <-done:
+		}
+	}()
+
+	return ctx
+}
+
 // WhenAny -- 指定した１つ以上のチャネルのどれかが１つが閉じられたら、閉じるチャネルを返します。
 //
 // チャネルを一つも渡さずに呼び出すと、既に close 済みのチャネルを返します。
-func WhenAny[T any](channels ...<-chan T) <-chan T {
+func WhenAny(channels ...<-chan struct{}) <-chan struct{} {
 	switch len(channels) {
 	case 0:
-		nilCh := make(chan T)
+		nilCh := make(chan struct{})
 		close(nilCh)
 
 		return nilCh
@@ -14,7 +34,7 @@ func WhenAny[T any](channels ...<-chan T) <-chan T {
 		return channels[0]
 	}
 
-	orDone := make(chan T)
+	orDone := make(chan struct{})
 	go func() {
 		defer close(orDone)
 

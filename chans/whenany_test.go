@@ -1,11 +1,53 @@
 package chans_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/devlights/gomy/chans"
+	"github.com/devlights/gomy/times"
 )
+
+func TestWhenAnyContext(t *testing.T) {
+	// Arrange
+	var (
+		rootCtx    = context.Background()
+		ctx1, cxl1 = context.WithTimeout(rootCtx, 100*time.Millisecond)
+	)
+	defer cxl1()
+
+	var (
+		ch1 = func() <-chan struct{} {
+			ch := make(chan struct{})
+			go func() {
+				defer close(ch)
+				time.Sleep(30 * time.Millisecond)
+			}()
+			return ch
+		}()
+		ch2 = func() <-chan struct{} {
+			ch := make(chan struct{})
+			go func() {
+				defer close(ch)
+				time.Sleep(60 * time.Millisecond)
+			}()
+			return ch
+		}()
+	)
+
+	// Act
+	elapsed := times.Stopwatch(func(start time.Time) {
+		var doneCtx context.Context = chans.WhenAnyContext(ctx1, ch1, ch2)
+		<-doneCtx.Done()
+	})
+
+	// Assert
+	t.Log(elapsed)
+	if 50*time.Millisecond <= elapsed {
+		t.Errorf("wrong %v", elapsed)
+	}
+}
 
 func TestWhenAny(t *testing.T) {
 	type (

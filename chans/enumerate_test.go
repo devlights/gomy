@@ -1,10 +1,31 @@
 package chans_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
 )
+
+func TestEnumerateContext(t *testing.T) {
+	// Arrange
+	var (
+		values = []string{"hello", "world"}
+		ctx    = context.Background()
+		in     = chans.Generator(ctx.Done(), values...)
+	)
+
+	// Act
+	var ret <-chan *chans.IterValue[string] = chans.EnumerateContext(ctx, in)
+
+	// Assert
+	for v := range ret {
+		i := v.Index
+		if v.Value != values[i] {
+			t.Errorf("[want] %v\t[got] %v", values[i], v.Value)
+		}
+	}
+}
 
 func TestEnumerate(t *testing.T) {
 	type (

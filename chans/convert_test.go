@@ -1,12 +1,36 @@
 package chans_test
 
 import (
+	"context"
 	"reflect"
 	"strconv"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
 )
+
+func TestConvertContext(t *testing.T) {
+	var (
+		rootCtx  = context.Background()
+		ctx, cxl = context.WithCancel(rootCtx)
+	)
+	defer cxl()
+
+	var (
+		in  = chans.Generator(ctx.Done(), 1, 2, 3, 4, 5)
+		out = []string{"1", "2", "3", "4", "5"}
+		fn  = func(i int) string { return strconv.Itoa(i) }
+	)
+
+	results := make([]string, 0)
+	for v := range chans.ConvertContext(ctx, in, fn) {
+		results = append(results, v)
+	}
+
+	if !reflect.DeepEqual(out, results) {
+		t.Errorf("[want] %v\t[got] %v\n", out, results)
+	}
+}
 
 func TestConvert(t *testing.T) {
 	var (

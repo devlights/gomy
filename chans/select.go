@@ -8,8 +8,8 @@ import (
 type (
 	// SelectValue -- chans.RecvAll() で利用されるデータ型です.
 	SelectValue struct {
-		Chosen int         // 選択されたチャネルのインデックス
-		Value  interface{} // 受信した値
+		Chosen int // 選択されたチャネルのインデックス
+		Value  any // 受信した値
 	}
 )
 
@@ -34,7 +34,7 @@ func (me SelectValue) Eq(other SelectValue) bool {
 //   - https://pkg.go.dev/reflect#Select
 //   - https://pkg.go.dev/reflect#SelectCase
 //   - https://dev.to/hgsgtk/handling-with-arbitrary-channels-by-reflectselect-4d5g
-func Select(chs ...chan interface{}) (chosen int, v interface{}, ok bool) {
+func Select(chs ...chan any) (chosen int, v any, ok bool) {
 	if len(chs) == 0 {
 		return -1, nil, false
 	}
@@ -59,12 +59,12 @@ func Select(chs ...chan interface{}) (chosen int, v interface{}, ok bool) {
 // RecvAny -- 指定されたチャネルリストから一つ値を取得します。どのチャネルが選択されるかは非決定的です。
 //
 // See: chans.Select
-func RecvAny(chs ...chan interface{}) (chosen int, v interface{}, ok bool) {
+func RecvAny(chs ...chan any) (chosen int, v any, ok bool) {
 	return Select(chs...)
 }
 
 // RecvAll -- 指定されたチャネルリストの全てから１つ値を取得して返却します。
-func RecvAll(chs ...chan interface{}) []SelectValue {
+func RecvAll(chs ...chan any) []SelectValue {
 	var (
 		wg  sync.WaitGroup
 		ret = make([]SelectValue, len(chs))

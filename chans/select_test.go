@@ -9,23 +9,23 @@ import (
 func TestSelect(t *testing.T) {
 	tests := []struct {
 		name    string
-		in, out []interface{}
+		in, out []any
 	}{
 		{
 			"3-chans",
-			[]interface{}{1, 2, 3},
-			[]interface{}{3, 2, 1},
+			[]any{1, 2, 3},
+			[]any{3, 2, 1},
 		},
 	}
 
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			chs := make([]chan interface{}, len(test.in))
+			chs := make([]chan any, len(test.in))
 			for i, v := range test.in {
 				var (
 					i, v = i, v
-					ch   = make(chan interface{})
+					ch   = make(chan any)
 				)
 				go func() {
 					ch <- v
@@ -66,23 +66,23 @@ func TestSelect(t *testing.T) {
 func TestRecvAny(t *testing.T) {
 	tests := []struct {
 		name    string
-		in, out []interface{}
+		in, out []any
 	}{
 		{
 			"3-chans",
-			[]interface{}{1, 2, 3},
-			[]interface{}{3, 2, 1},
+			[]any{1, 2, 3},
+			[]any{3, 2, 1},
 		},
 	}
 
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			chs := make([]chan interface{}, len(test.in))
+			chs := make([]chan any, len(test.in))
 			for i, v := range test.in {
 				var (
 					i, v = i, v
-					ch   = make(chan interface{})
+					ch   = make(chan any)
 				)
 				go func() {
 					ch <- v
@@ -123,12 +123,12 @@ func TestRecvAny(t *testing.T) {
 func TestRecvAll(t *testing.T) {
 	tests := []struct {
 		name string
-		in   []interface{}
+		in   []any
 		out  []chans.SelectValue
 	}{
 		{
 			"3-chans",
-			[]interface{}{1, 2, 3},
+			[]any{1, 2, 3},
 			[]chans.SelectValue{
 				{2, 3},
 				{1, 2},
@@ -140,11 +140,11 @@ func TestRecvAll(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			chs := make([]chan interface{}, len(test.in))
+			chs := make([]chan any, len(test.in))
 			for i, v := range test.in {
 				var (
 					i, v = i, v
-					ch   = make(chan interface{})
+					ch   = make(chan any)
 				)
 				go func() {
 					ch <- v

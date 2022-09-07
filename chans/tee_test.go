@@ -1,10 +1,53 @@
 package chans_test
 
 import (
+	"context"
+	"sync"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
+	"golang.org/x/exp/slices"
 )
+
+func TestTeeContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx    = context.Background()
+		values = []int{1, 2, 3}
+		in     = chans.GeneratorContext(ctx, values...)
+	)
+
+	// Act
+	var ch1, ch2 <-chan int = chans.TeeContext(ctx, in)
+	var (
+		wg   sync.WaitGroup
+		ret1 = make([]int, 0)
+		ret2 = make([]int, 0)
+	)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for v := range ch1 {
+			ret1 = append(ret1, v)
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		for v := range ch2 {
+			ret2 = append(ret2, v)
+		}
+	}()
+	wg.Wait()
+
+	// Assert
+	if !slices.Equal(values, ret1) {
+		t.Errorf("[ret1][want] %v\t[got] %v", values, ret1)
+	}
+	if !slices.Equal(values, ret2) {
+		t.Errorf("[ret2][want] %v\t[got] %v", values, ret2)
+	}
+}
 
 func TestTee(t *testing.T) {
 	type (

@@ -1,10 +1,36 @@
 package chans_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
 )
+
+func TestTakeContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx    = context.Background()
+		values = []int{1, 2, 3, 4, 5}
+		in     = chans.GeneratorContext(ctx, values...)
+		out    = []int{1, 2, 3}
+	)
+
+	// Act
+	var ret <-chan int = chans.TakeContext(ctx, in, 3)
+
+	// Assert
+	for v := range chans.EnumerateContext(ctx, ret) {
+		var (
+			idx = v.Index
+			val = v.Value
+		)
+
+		if out[idx] != val {
+			t.Errorf("[want] %v\t[got] %v", out[idx], val)
+		}
+	}
+}
 
 func TestTake(t *testing.T) {
 	type (

@@ -1,18 +1,51 @@
 package chans_test
 
 import (
+	"context"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
 )
 
+func TestMapContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx    = context.Background()
+		values = []int{1, 2, 3}
+		in     = chans.GeneratorContext(ctx, values...)
+		out    = []string{"1", "2", "3"}
+	)
+
+	// Act
+	var ret <-chan *chans.MapValue[int, string] = chans.MapContext(ctx, in, func(v int) string {
+		return strconv.Itoa(v)
+	})
+
+	// Assert
+	for v := range chans.EnumerateContext(ctx, ret) {
+		var (
+			idx = v.Index
+			val = v.Value
+		)
+
+		if values[idx] != val.Before {
+			t.Errorf("[want] %v\t[got] %v", values[idx], val.Before)
+		}
+
+		if out[idx] != val.After {
+			t.Errorf("[want] %v\t[got] %v", out[idx], val.After)
+		}
+	}
+}
+
 func TestMap(t *testing.T) {
 	type (
 		testin struct {
 			input []string
-			fn    chans.MapFunc[string]
+			fn    chans.MapFunc[string, string]
 		}
 		testout struct {
 			result []string

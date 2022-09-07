@@ -1,8 +1,33 @@
 package chans
 
 import (
+	"context"
 	"sync"
 )
+
+func FanOutContext[T any](ctx context.Context, in <-chan T, workerCount int, callback func(T)) []context.Context {
+	var (
+		dones   = FanOut(ctx.Done(), in, workerCount, callback)
+		results = make([]context.Context, len(dones))
+	)
+
+	for i, done := range dones {
+		results[i] = func(done <-chan struct{}) context.Context {
+			var (
+				ctx, cxl = context.WithCancel(ctx)
+			)
+
+			go func() {
+				defer cxl()
+				<-done
+			}()
+
+			return ctx
+		}(done)
+	}
+
+	return results
+}
 
 // FanOut -- 指定されたチャネルの処理を指定されたワーカーの数でファンアウトします。
 //
@@ -31,6 +56,11 @@ func FanOut[T any](done <-chan struct{}, in <-chan T, workerCount int, callback 
 	}
 
 	return outChList
+}
+
+// FanOutWgContext は、FanOutWg の context.Context 版です.
+func FanOutWgContext[T any](ctx context.Context, in <-chan T, workerCount int, callback func(T)) *sync.WaitGroup {
+	return FanOutWg(ctx.Done(), in, workerCount, callback)
 }
 
 // FanOutWg -- FanOut() の sync.WaitGroup を返す版です。
