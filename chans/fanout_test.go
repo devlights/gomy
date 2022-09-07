@@ -1,13 +1,45 @@
 package chans_test
 
 import (
+	"context"
 	"reflect"
 	"sort"
 	"testing"
 	"time"
 
 	"github.com/devlights/gomy/chans"
+	"github.com/devlights/gomy/ctxs"
+	"golang.org/x/exp/slices"
 )
+
+func TestFanOutContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx         = context.Background()
+		values      = []int{1, 2, 3, 4, 5}
+		in          = chans.Generator(ctx.Done(), values...)
+		out         = make([]int, 0, len(values))
+		workerCount = len(values)
+	)
+
+	// Act
+	var ret []context.Context = chans.FanOutContext(ctx, in, workerCount, func(v int) {
+		out = append(out, v)
+		t.Log(out)
+	})
+
+	// Assert
+	if len(ret) != workerCount {
+		t.Errorf("[want] %v\t[got] %v", workerCount, len(ret))
+	}
+
+	<-ctxs.WhenAll(ctx, ret...).Done()
+
+	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
+	if !slices.Equal(values, out) {
+		t.Errorf("[want] equal\t[got] %v, %v", values, out)
+	}
+}
 
 func TestFanOut(t *testing.T) {
 	type (

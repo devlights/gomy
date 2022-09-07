@@ -1,8 +1,33 @@
 package chans
 
 import (
+	"context"
 	"sync"
 )
+
+func FanOutContext[T any](ctx context.Context, in <-chan T, workerCount int, callback func(T)) []context.Context {
+	var (
+		dones   = FanOut(ctx.Done(), in, workerCount, callback)
+		results = make([]context.Context, len(dones))
+	)
+
+	for i, done := range dones {
+		results[i] = func(done <-chan struct{}) context.Context {
+			var (
+				ctx, cxl = context.WithCancel(ctx)
+			)
+
+			go func() {
+				defer cxl()
+				<-done
+			}()
+
+			return ctx
+		}(done)
+	}
+
+	return results
+}
 
 // FanOut -- 指定されたチャネルの処理を指定されたワーカーの数でファンアウトします。
 //
