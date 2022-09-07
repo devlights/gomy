@@ -1,11 +1,30 @@
 package chans_test
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
 )
+
+func TestForEachContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx = context.Background()
+		in  = []int{1, 2, 3, 4, 5}
+	)
+
+	// Act
+	var ret <-chan int = chans.ForEachContext(ctx, in...)
+
+	// Assert
+	for v := range chans.EnumerateContext(ctx, ret) {
+		if in[v.Index] != v.Value {
+			t.Errorf("[want] %v\t[got] %v", in[v.Index], v.Index)
+		}
+	}
+}
 
 func TestForEach(t *testing.T) {
 	type (
