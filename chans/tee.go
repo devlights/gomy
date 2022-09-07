@@ -1,8 +1,13 @@
 package chans
 
+import "context"
+
+// TeeContext は、Tee の context.Context 版です.
+func TeeContext[T any](ctx context.Context, in <-chan T) (<-chan T, <-chan T) {
+	return Tee(ctx.Done(), in)
+}
+
 // Tee -- Unix の tee コマンドのように一つの入力を２つに複製するチャネルを返します。
-//
-// noinspection GoNilness
 func Tee[T any](done <-chan struct{}, in <-chan T) (<-chan T, <-chan T) {
 	out1 := make(chan T)
 	out2 := make(chan T)
