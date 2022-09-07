@@ -1,5 +1,22 @@
 package chans
 
+import "context"
+
+// SkipContext は、Skip の context.Context 版です.
+func SkipContext[T any](ctx context.Context, in <-chan T, count int) <-chan T {
+	return Skip(ctx.Done(), in, count)
+}
+
+// SkipWhileContext は、SkipWhile の context.Context 版です.
+func SkipWhileContext[T comparable](ctx context.Context, in <-chan T, value T) <-chan T {
+	return SkipWhile(ctx.Done(), in, value)
+}
+
+// SkipWhileFnContext は、SkipWhileFn の context.Context 版です.
+func SkipWhileFnContext[T comparable](ctx context.Context, in <-chan T, fn func() T) <-chan T {
+	return SkipWhileFn(ctx.Done(), in, fn)
+}
+
 // Skip -- 指定した個数分、入力用チャネルから値をスキップするチャネルを返します。
 func Skip[T any](done <-chan struct{}, in <-chan T, count int) <-chan T {
 	out := make(chan T)
