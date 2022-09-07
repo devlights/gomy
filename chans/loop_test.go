@@ -9,6 +9,26 @@ import (
 	"github.com/devlights/gomy/chans"
 )
 
+func TestLoopContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx   = context.Background()
+		start = 1
+		end   = 5
+		out   = []int{1, 2, 3, 4, 5}
+	)
+
+	// Act
+	var ret <-chan int = chans.LoopContext(ctx, start, end)
+
+	// Assert
+	for v := range chans.EnumerateContext(ctx, ret) {
+		if out[v.Index] != v.Value {
+			t.Errorf("[want] %v\t[got] %v", out[v.Index], v.Value)
+		}
+	}
+}
+
 func TestLoop(t *testing.T) {
 	type (
 		testin struct {
