@@ -1,11 +1,37 @@
 package chans_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/devlights/gomy/chans"
+	"github.com/devlights/gomy/times"
 )
+
+func TestIntervalContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx      = context.Background()
+		values   = []int{1, 2, 3}
+		in       = chans.GeneratorContext(ctx, values...)
+		interval = 100 * time.Millisecond
+	)
+
+	// Act
+	var ret <-chan int = chans.IntervalContext(ctx, in, interval)
+
+	elapsed := times.Stopwatch(func(start time.Time) {
+		for v := range ret {
+			t.Log(v)
+		}
+	})
+
+	// Assert
+	if !(300*time.Millisecond <= elapsed && elapsed <= 1*time.Second) {
+		t.Errorf("invalid interval flow [%v]", elapsed)
+	}
+}
 
 func TestInterval(t *testing.T) {
 	type (
