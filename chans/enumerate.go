@@ -1,5 +1,7 @@
 package chans
 
+import "context"
+
 type (
 	// IterValue -- chans.Enumerate() にて利用されるデータ型です。
 	IterValue[T any] struct {
@@ -13,6 +15,11 @@ func newIterValue[T any](i int, v T) *IterValue[T] {
 		Index: i,
 		Value: v,
 	}
+}
+
+// EnumerateContext は、 Enumerate の context.Context 版です.
+func EnumerateContext[T any](ctx context.Context, in <-chan T) <-chan *IterValue[T] {
+	return Enumerate(ctx.Done(), in)
 }
 
 // Enumerate -- 指定された入力チャネルの要素に対してインデックスを付与したデータを返すチャネルを生成します。
