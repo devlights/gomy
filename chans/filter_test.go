@@ -1,12 +1,37 @@
 package chans_test
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/devlights/gomy/chans"
+	"golang.org/x/exp/slices"
 )
+
+func TestFilterContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx       = context.Background()
+		values    = []int{1, 2, 3, 4, 5}
+		in        = chans.Generator(ctx.Done(), values...)
+		out       = []int{4, 5}
+		predicate = func(v int) bool {
+			return v > 3
+		}
+	)
+
+	// Act
+	var ret <-chan int = chans.FilterContext(ctx, in, predicate)
+
+	// Assert
+	for v := range ret {
+		if !slices.Contains(out, v) {
+			t.Errorf("%v is not included in the %v", v, out)
+		}
+	}
+}
 
 func TestFilter(t *testing.T) {
 	type (
