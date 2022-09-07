@@ -30,7 +30,7 @@ func TestWhenAllContext(t *testing.T) {
 			ch := make(chan struct{})
 			go func() {
 				defer close(ch)
-				time.Sleep(40 * time.Millisecond)
+				time.Sleep(60 * time.Millisecond)
 			}()
 			return ch
 		}()
@@ -44,7 +44,7 @@ func TestWhenAllContext(t *testing.T) {
 
 	// Assert
 	t.Log(elapsed)
-	if 100*time.Millisecond <= elapsed {
+	if elapsed < 60*time.Millisecond {
 		t.Errorf("wrong %v", elapsed)
 	}
 }
