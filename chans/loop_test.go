@@ -29,6 +29,30 @@ func TestLoopContext(t *testing.T) {
 	}
 }
 
+func TestLoopInfiniteContext(t *testing.T) {
+	// Arrange
+	var (
+		rootCtx  = context.Background()
+		ctx, cxl = context.WithTimeout(rootCtx, 100*time.Millisecond)
+		interval = 10 * time.Millisecond
+	)
+	defer cxl()
+
+	// Act
+	var ret <-chan int = chans.LoopInfiniteContext(ctx)
+	var out <-chan int = chans.IntervalContext(ctx, ret, interval)
+
+	// Assert
+	tmp := make([]int, 0)
+	for v := range out {
+		tmp = append(tmp, v)
+	}
+
+	if len(tmp) < 5 {
+		t.Errorf("wrong count [%d]", len(tmp))
+	}
+}
+
 func TestLoop(t *testing.T) {
 	type (
 		testin struct {
