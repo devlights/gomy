@@ -58,6 +58,11 @@ func FanOut[T any](done <-chan struct{}, in <-chan T, workerCount int, callback 
 	return outChList
 }
 
+// FanOutWgContext は、FanOutWg の context.Context 版です.
+func FanOutWgContext[T any](ctx context.Context, in <-chan T, workerCount int, callback func(T)) *sync.WaitGroup {
+	return FanOutWg(ctx.Done(), in, workerCount, callback)
+}
+
 // FanOutWg -- FanOut() の sync.WaitGroup を返す版です。
 func FanOutWg[T any](done <-chan struct{}, in <-chan T, workerCount int, callback func(T)) *sync.WaitGroup {
 	wg := sync.WaitGroup{}

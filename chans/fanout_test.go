@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"sort"
+	"sync"
 	"testing"
 	"time"
 
@@ -34,6 +35,31 @@ func TestFanOutContext(t *testing.T) {
 	}
 
 	<-ctxs.WhenAll(ctx, ret...).Done()
+
+	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
+	if !slices.Equal(values, out) {
+		t.Errorf("[want] equal\t[got] %v, %v", values, out)
+	}
+}
+
+func TestFanOutWgContext(t *testing.T) {
+	// Arrange
+	var (
+		ctx         = context.Background()
+		values      = []int{1, 2, 3, 4, 5}
+		in          = chans.Generator(ctx.Done(), values...)
+		out         = make([]int, 0, len(values))
+		workerCount = len(values)
+	)
+
+	// Act
+	var ret *sync.WaitGroup = chans.FanOutWgContext(ctx, in, workerCount, func(v int) {
+		out = append(out, v)
+		t.Log(out)
+	})
+
+	// Assert
+	ret.Wait()
 
 	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
 	if !slices.Equal(values, out) {
