@@ -7,6 +7,11 @@ func RepeatContext[T any](ctx context.Context, values ...T) <-chan T {
 	return Repeat(ctx.Done(), values...)
 }
 
+// RepeatFnContext は、RepeatFn の context.Context 版です.
+func RepeatFnContext[T any](ctx context.Context, fn func() T) <-chan T {
+	return RepeatFn(ctx.Done(), fn)
+}
+
 // Repeat -- 指定した値を永遠と繰り返すチャネルを返します。
 func Repeat[T any](done <-chan struct{}, values ...T) <-chan T {
 	out := make(chan T)

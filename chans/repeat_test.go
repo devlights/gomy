@@ -32,9 +32,41 @@ func TestRepeatContext(t *testing.T) {
 	if cnt <= len(tmp) {
 		t.Errorf("[want] more than %v\t[got] %v", len(tmp), cnt)
 	}
-	
+
 	if len(tmp) != 3 {
 		t.Errorf("[want] 3\t[got] %v", len(tmp))
+	}
+}
+
+func TestRepeatFnContext(t *testing.T) {
+	// Arrange
+	var (
+		rootCtx  = context.Background()
+		ctx, cxl = context.WithTimeout(rootCtx, 100*time.Millisecond)
+		fn       = func() func() int {
+			cnt := 1
+			return func() int {
+				v := cnt
+				cnt++
+
+				return v
+			}
+		}()
+	)
+	defer cxl()
+
+	// Act
+	var ret <-chan int = chans.RepeatFnContext(ctx, fn)
+	var out <-chan int = chans.IntervalContext(ctx, ret, 10*time.Millisecond)
+
+	// Assert
+	tmp := make([]int, 0)
+	for v := range out {
+		tmp = append(tmp, v)
+	}
+
+	if len(tmp) <= 5 {
+		t.Errorf("[want] 10\t[got] %v", len(tmp))
 	}
 }
 
