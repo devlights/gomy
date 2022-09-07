@@ -12,7 +12,7 @@ func TestMap(t *testing.T) {
 	type (
 		testin struct {
 			input []string
-			fn    chans.MapFunc[string]
+			fn    chans.MapFunc[string, string]
 		}
 		testout struct {
 			result []string
