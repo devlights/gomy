@@ -1,5 +1,7 @@
 package chans
 
+import "context"
+
 type (
 	// MapFunc -- chans.Map にて利用されるチャネルの各要素に適用する関数です。
 	MapFunc[T any, R any] func(T) R
@@ -16,6 +18,11 @@ func newMapValue[T any, R any](before T, after R) *MapValue[T, R] {
 		Before: before,
 		After:  after,
 	}
+}
+
+// MapContext は、Map の context.Context 版です.
+func MapContext[T any, R any](ctx context.Context, in <-chan T, fn MapFunc[T, R]) <-chan *MapValue[T, R] {
+	return Map(ctx.Done(), in, fn)
 }
 
 // Map -- 関数 fn を入力チャネル in の各要素に適用した結果を返すチャネルを生成します。
