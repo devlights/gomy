@@ -1,5 +1,12 @@
 package chans
 
+import "context"
+
+// FanInContext は、 FanIn の context.Context 版です.
+func FanInContext[T any](ctx context.Context, channels ...<-chan T) <-chan T {
+	return FanIn(ctx.Done(), channels...)
+}
+
 // FanIn -- 指定されたチャネルリストをファンインするチャネルを返します。
 func FanIn[T any](done <-chan struct{}, channels ...<-chan T) <-chan T {
 	out := make(chan T)
