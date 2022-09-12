@@ -969,3 +969,22 @@ func ExampleWhenAny() {
 	// Output:
 	// elapsed: about 100msec ==> true
 }
+
+func ExampleSliceContext() {
+	var (
+		rootCtx  = context.Background()
+		ctx, cxl = context.WithCancel(rootCtx)
+	)
+	defer cxl()
+
+	var (
+		values = []int{1, 2, 3, 4, 5}
+		in     = chans.GeneratorContext(ctx, values...)
+		out    = chans.SliceContext(ctx, in)
+	)
+
+	fmt.Printf("%[1]v (%[1]T)", out)
+
+	// Output:
+	// [1 2 3 4 5] ([]int)
+}
