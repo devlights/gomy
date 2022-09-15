@@ -5,6 +5,7 @@ import (
 	"sync"
 )
 
+// FanOutContext は、 Fanout の ctx.Context 版です.
 func FanOutContext[T any](ctx context.Context, in <-chan T, workerCount int, callback func(T)) []context.Context {
 	var (
 		dones   = FanOut(ctx.Done(), in, workerCount, callback)
