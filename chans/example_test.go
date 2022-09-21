@@ -320,9 +320,13 @@ func ExampleForEach() {
 	defer mainCxl()
 	defer procCxl()
 
-	for v := range chans.ForEach(procCtx.Done(), 1, 2, 3) {
+	var (
+		in = chans.GeneratorContext(procCtx, 1, 2, 3)
+	)
+
+	chans.ForEachContext(procCtx, in, func(v int) {
 		fmt.Println(v)
-	}
+	})
 
 	// Output:
 	// 1
@@ -782,7 +786,7 @@ func ExampleTake() {
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.ForEach(procCtx.Done(), 1, 2, 3, 4, 5)
+	numbers := chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
 	takes := chans.Take(procCtx.Done(), numbers, 3)
 
 	for v := range takes {
@@ -805,7 +809,7 @@ func ExampleTakeWhile() {
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.ForEach(procCtx.Done(), 1, 1, 1, 4, 1)
+	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 1)
 	takes := chans.TakeWhile(procCtx.Done(), numbers, 1)
 
 	for v := range takes {
@@ -828,7 +832,7 @@ func ExampleTakeWhileFn() {
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.ForEach(procCtx.Done(), 1, 1, 1, 4, 1)
+	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 1)
 	takes := chans.TakeWhileFn(procCtx.Done(), numbers, func() int { return 1 })
 
 	for v := range takes {

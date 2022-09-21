@@ -32,7 +32,7 @@ func TestBufferContext(t *testing.T) {
 			defer cxl()
 
 			results := make([][]interface{}, 0)
-			for chunk := range chans.BufferContext(ctx, chans.ForEach(ctx.Done(), c.in...), c.count) {
+			for chunk := range chans.BufferContext(ctx, chans.Generator(ctx.Done(), c.in...), c.count) {
 				results = append(results, chunk)
 			}
 
@@ -63,7 +63,7 @@ func TestBuffer(t *testing.T) {
 			defer close(done)
 
 			results := make([][]interface{}, 0)
-			for chunk := range chans.Buffer(done, chans.ForEach(done, c.in...), c.count) {
+			for chunk := range chans.Buffer(done, chans.Generator(done, c.in...), c.count) {
 				results = append(results, chunk)
 			}
 
