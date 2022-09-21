@@ -72,7 +72,7 @@ func TestInterval(t *testing.T) {
 
 			start := time.Now()
 			var lastElapsed time.Duration
-			for v := range chans.Interval(done, chans.ForEach(done, c.in.input...), c.in.interval) {
+			for v := range chans.Interval(done, chans.Generator(done, c.in.input...), c.in.interval) {
 				lastElapsed = time.Since(start)
 				t.Logf("[test-%02d] %v (%v)", caseIndex, v, lastElapsed)
 			}

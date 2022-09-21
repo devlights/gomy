@@ -43,7 +43,7 @@ func (m *mergedWg) Wait() {
 	done := make(chan struct{})
 	defer close(done)
 
-	<-chans.WhenAll(chans.FanOut(done, chans.ForEach(done, m.wgs...), len(m.wgs), func(v interface{}) {
+	<-chans.WhenAll(chans.FanOut(done, chans.Generator(done, m.wgs...), len(m.wgs), func(v interface{}) {
 		if wg, ok := v.(*sync.WaitGroup); ok {
 			wg.Wait()
 		}

@@ -136,7 +136,7 @@ func TestFanOut(t *testing.T) {
 			start := time.Now()
 			wa := chans.WhenAll(chans.FanOut(
 				done,
-				chans.ForEach(done, c.in.input...),
+				chans.Generator(done, c.in.input...),
 				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)
@@ -232,7 +232,7 @@ func TestFanOutWg(t *testing.T) {
 			start := time.Now()
 			wg := chans.FanOutWg(
 				done,
-				chans.ForEach(done, c.in.input...),
+				chans.Generator(done, c.in.input...),
 				c.in.workerCount,
 				func(v interface{}) {
 					<-time.After(c.in.interval)

@@ -74,7 +74,7 @@ func TestMap(t *testing.T) {
 			defer close(done)
 
 			results := make([]string, 0)
-			for v := range chans.Map(done, chans.ForEach(done, c.in.input...), c.in.fn) {
+			for v := range chans.Map(done, chans.Generator(done, c.in.input...), c.in.fn) {
 				t.Logf("[test-%02d] [%v] ==> [%v]", caseIndex, v.Before, v.After)
 				results = append(results, v.After)
 			}
