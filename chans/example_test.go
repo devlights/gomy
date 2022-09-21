@@ -516,6 +516,33 @@ func ExampleMap() {
 	// 3,6
 }
 
+func ExampleMerge() {
+	var (
+		rootCtx          = context.Background()
+		mainCtx, mainCxl = context.WithCancel(rootCtx)
+		procCtx, procCxl = context.WithTimeout(mainCtx, 100*time.Millisecond)
+	)
+	defer mainCxl()
+	defer procCxl()
+
+	var (
+		inCh1 = chans.GeneratorContext(procCtx, 1, 2, 3)
+		inCh2 = chans.GeneratorContext(procCtx, 4, 5, 6)
+	)
+
+	for v := range chans.MergeContext(procCtx, inCh1, inCh2) {
+		fmt.Println(v)
+	}
+
+	// Unordered output:
+	// 1
+	// 2
+	// 3
+	// 4
+	// 5
+	// 6
+}
+
 func ExampleOrDone() {
 	var (
 		rootCtx          = context.Background()
