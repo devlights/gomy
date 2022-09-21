@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/devlights/gomy/chans"
+	"github.com/devlights/gomy/ctxs"
 )
 
 func ExampleBridge() {
@@ -16,18 +17,17 @@ func ExampleBridge() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	chSeq := make(chan (<-chan int))
 	go func() {
 		defer close(chSeq)
-		chSeq <- chans.Generator(procCtx.Done(), 1, 2, 3)
-		chSeq <- chans.Generator(procCtx.Done(), 4, 5, 6)
+		chSeq <- chans.GeneratorContext(procCtx, 1, 2, 3)
+		chSeq <- chans.GeneratorContext(procCtx, 4, 5, 6)
 	}()
 
-	for v := range chans.Bridge(procCtx.Done(), chSeq) {
+	for v := range chans.BridgeContext(procCtx, chSeq) {
 		fmt.Println(v)
 	}
 
@@ -46,7 +46,6 @@ func ExampleBuffer() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
@@ -55,8 +54,8 @@ func ExampleBuffer() {
 		count = 3
 	)
 
-	numbers := chans.Generator(procCtx.Done(), data...)
-	chunks := chans.Buffer(procCtx.Done(), numbers, count)
+	numbers := chans.GeneratorContext(procCtx, data...)
+	chunks := chans.BufferContext(procCtx, numbers, count)
 
 	for chunk := range chunks {
 		fmt.Println(chunk)
@@ -69,36 +68,29 @@ func ExampleBuffer() {
 }
 
 func ExampleChain() {
-	// functions
+	// context and channels
 	var (
-		makeGoroutine = func() <-chan struct{} {
-			ch := make(chan struct{})
+		ctx  = context.Background()
+		base = func(pCtx context.Context) context.Context {
+			ctx, cxl := context.WithCancel(pCtx)
 			go func() {
-				defer close(ch)
+				defer cxl()
 				time.Sleep(100 * time.Millisecond)
 				fmt.Println("base")
 			}()
-			return ch
-		}
+			return ctx
+		}(ctx)
 	)
 
-	// channels
-	var (
-		done = make(chan struct{})
-		base = makeGoroutine()
-	)
-
-	defer close(done)
-
-	chain1 := chans.Chain(done, base, func(t time.Time) {
+	chain1 := chans.ChainContext(ctx, base, func(t time.Time) {
 		fmt.Println("chain-1")
 	})
 
-	chain2 := chans.Chain(done, chain1, func(t time.Time) {
+	chain2 := chans.ChainContext(ctx, chain1, func(t time.Time) {
 		fmt.Println("chain-2")
 	})
 
-	<-chans.WhenAll(base, chain1, chain2)
+	<-ctxs.WhenAll(ctx, base, chain1, chain2).Done()
 
 	// Output:
 	//
@@ -113,12 +105,11 @@ func ExampleChunk() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5, 6, 7)
-	chunks := chans.Chunk(procCtx.Done(), numbers, 3)
+	numbers := chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5, 6, 7)
+	chunks := chans.ChunkContext(procCtx, numbers, 3)
 
 	for chunk := range chunks {
 		fmt.Println(chunk)
@@ -136,14 +127,13 @@ func ExampleConcat() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	nums1 := chans.Generator(procCtx.Done(), 1, 2, 3)
-	nums2 := chans.Generator(procCtx.Done(), 4, 5, 6)
+	nums1 := chans.GeneratorContext(procCtx, 1, 2, 3)
+	nums2 := chans.GeneratorContext(procCtx, 4, 5, 6)
 
-	for v := range chans.Concat(procCtx.Done(), nums1, nums2) {
+	for v := range chans.ConcatContext(procCtx, nums1, nums2) {
 		fmt.Println(v)
 	}
 
@@ -166,9 +156,8 @@ func ExampleConvert() {
 	defer procCxl()
 
 	var (
-		done      = procCtx.Done()
-		numbers   = chans.Generator(done, 1, 2, 3)
-		converted = chans.Convert(done, numbers, func(v int) string { return strconv.Itoa(v) })
+		numbers   = chans.GeneratorContext(procCtx, 1, 2, 3)
+		converted = chans.ConvertContext(procCtx, numbers, func(v int) string { return strconv.Itoa(v) })
 	)
 
 	for v := range converted {
@@ -187,12 +176,11 @@ func ExampleEnumerate() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 9, 8, 7)
-	values := chans.Enumerate(procCtx.Done(), numbers)
+	numbers := chans.GeneratorContext(procCtx, 9, 8, 7)
+	values := chans.EnumerateContext(procCtx, numbers)
 
 	for v := range values {
 		fmt.Printf("%d:%v\n", v.Index, v.Value)
@@ -210,14 +198,13 @@ func ExampleFanIn() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numStream1 := chans.Generator(procCtx.Done(), 1, 2, 3)
-	numStream2 := chans.Generator(procCtx.Done(), 4, 5, 6)
+	numStream1 := chans.GeneratorContext(procCtx, 1, 2, 3)
+	numStream2 := chans.GeneratorContext(procCtx, 4, 5, 6)
 
-	for v := range chans.FanIn(procCtx.Done(), numStream1, numStream2) {
+	for v := range chans.FanInContext(procCtx, numStream1, numStream2) {
 		fmt.Println(v)
 	}
 
@@ -236,17 +223,16 @@ func ExampleFanOut() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		nums     = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5, 6)
+		nums     = chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5, 6)
 		callback = func(v int) { fmt.Println(v) }
 	)
 
-	dones := chans.FanOut(procCtx.Done(), nums, 3, callback)
-	<-chans.WhenAll(dones...)
+	dones := chans.FanOutContext(procCtx, nums, 3, callback)
+	<-ctxs.WhenAll(procCtx, dones...).Done()
 
 	// Unordered output:
 	// 4
@@ -263,16 +249,15 @@ func ExampleFanOutWg() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		nums     = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5, 6)
+		nums     = chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5, 6)
 		callback = func(v int) { fmt.Println(v) }
 	)
 
-	wg := chans.FanOutWg(procCtx.Done(), nums, 3, callback)
+	wg := chans.FanOutWgContext(procCtx, nums, 3, callback)
 	wg.Wait()
 
 	// Unordered output:
@@ -290,18 +275,17 @@ func ExampleFilter() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		numbers   = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
+		numbers   = chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5)
 		predicate = func(v int) bool {
 			return v%2 == 0
 		}
 	)
 
-	for v := range chans.Filter(procCtx.Done(), numbers, predicate) {
+	for v := range chans.FilterContext(procCtx, numbers, predicate) {
 		fmt.Println(v)
 	}
 
@@ -316,7 +300,6 @@ func ExampleForEach() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
@@ -340,7 +323,6 @@ func ExampleFromIntCh() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
@@ -379,7 +361,6 @@ func ExampleFromStringCh() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
@@ -418,11 +399,10 @@ func ExampleGenerator() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
+	numbers := chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5)
 	for v := range numbers {
 		fmt.Println(v)
 	}
@@ -442,14 +422,13 @@ func ExampleLoopInfinite() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 10*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	// channels
 	var (
-		infinite = chans.LoopInfinite(procCtx.Done())
-		takes    = chans.Take(procCtx.Done(), chans.FromIntCh(infinite), 5)
+		infinite = chans.LoopInfiniteContext(procCtx)
+		takes    = chans.TakeContext(procCtx, infinite, 5)
 	)
 
 	for v := range takes {
@@ -470,13 +449,12 @@ func ExampleInterval() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		numbers      = chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
-		withInterval = chans.Interval(procCtx.Done(), numbers, 5*time.Millisecond)
+		numbers      = chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5)
+		withInterval = chans.IntervalContext(procCtx, numbers, 5*time.Millisecond)
 	)
 
 	begin := time.Now()
@@ -497,11 +475,10 @@ func ExampleLoop() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 10*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	for v := range chans.Loop(procCtx.Done(), 0, 5) {
+	for v := range chans.LoopContext(procCtx, 0, 5) {
 		fmt.Println(v)
 	}
 
@@ -519,18 +496,17 @@ func ExampleMap() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		numbers = chans.Generator(procCtx.Done(), 1, 2, 3)
+		numbers = chans.GeneratorContext(procCtx, 1, 2, 3)
 		fn      = func(original int) (after int) {
 			return original * 2
 		}
 	)
 
-	for v := range chans.Map(procCtx.Done(), numbers, fn) {
+	for v := range chans.MapContext(procCtx, numbers, fn) {
 		fmt.Printf("%v,%v\n", v.Before, v.After)
 	}
 
@@ -547,15 +523,14 @@ func ExampleOrDone() {
 		procCtx, procCxl = context.WithTimeout(mainCtx, 1*time.Minute)
 		genCtx, genCxl   = context.WithCancel(mainCtx)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 	defer genCxl()
 
-	inCh := chans.Generator(genCtx.Done(), "h", "e", "l", "l", "o")
+	inCh := chans.GeneratorContext(genCtx, "h", "e", "l", "l", "o")
 
 	var result []interface{}
-	for v := range chans.OrDone(procCtx.Done(), inCh) {
+	for v := range chans.OrDoneContext(procCtx, inCh) {
 		func() {
 			defer procCxl()
 			result = append(result, v)
@@ -574,11 +549,10 @@ func ExampleRepeatFn() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	ch := make(chan interface{})
+	ch := make(chan int)
 	go func() {
 		defer close(ch)
 		for {
@@ -592,8 +566,8 @@ func ExampleRepeatFn() {
 		}
 	}()
 
-	repeats := chans.RepeatFn(procCtx.Done(), func() interface{} { return <-ch })
-	takes := chans.Take(procCtx.Done(), repeats, 6)
+	repeats := chans.RepeatFnContext(procCtx, func() int { return <-ch })
+	takes := chans.TakeContext(procCtx, repeats, 6)
 
 	for v := range takes {
 		fmt.Println(v)
@@ -614,12 +588,11 @@ func ExampleRepeat() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	repeats := chans.Repeat(procCtx.Done(), 1, 2, 3)
-	takes := chans.Take(procCtx.Done(), repeats, 6)
+	repeats := chans.RepeatContext(procCtx, 1, 2, 3)
+	takes := chans.TakeContext(procCtx, repeats, 6)
 
 	for v := range takes {
 		fmt.Println(v)
@@ -716,12 +689,11 @@ func ExampleSkipWhileFn() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 5)
-	items := chans.SkipWhileFn(procCtx.Done(), numbers, func() int { return 1 })
+	numbers := chans.GeneratorContext(procCtx, 1, 1, 1, 4, 5)
+	items := chans.SkipWhileFnContext(procCtx, numbers, func() int { return 1 })
 
 	for v := range items {
 		fmt.Println(v)
@@ -738,12 +710,11 @@ func ExampleSkipWhile() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 5)
-	items := chans.SkipWhile(procCtx.Done(), numbers, 1)
+	numbers := chans.GeneratorContext(procCtx, 1, 1, 1, 4, 5)
+	items := chans.SkipWhileContext(procCtx, numbers, 1)
 
 	for v := range items {
 		fmt.Println(v)
@@ -760,12 +731,11 @@ func ExampleSkip() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 5)
-	items := chans.Skip(procCtx.Done(), numbers, 3)
+	numbers := chans.GeneratorContext(procCtx, 1, 1, 1, 4, 5)
+	items := chans.SkipContext(procCtx, numbers, 3)
 
 	for v := range items {
 		fmt.Println(v)
@@ -782,12 +752,11 @@ func ExampleTake() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 2, 3, 4, 5)
-	takes := chans.Take(procCtx.Done(), numbers, 3)
+	numbers := chans.GeneratorContext(procCtx, 1, 2, 3, 4, 5)
+	takes := chans.TakeContext(procCtx, numbers, 3)
 
 	for v := range takes {
 		fmt.Println(v)
@@ -805,12 +774,11 @@ func ExampleTakeWhile() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 1)
-	takes := chans.TakeWhile(procCtx.Done(), numbers, 1)
+	numbers := chans.GeneratorContext(procCtx, 1, 1, 1, 4, 1)
+	takes := chans.TakeWhileContext(procCtx, numbers, 1)
 
 	for v := range takes {
 		fmt.Println(v)
@@ -828,12 +796,11 @@ func ExampleTakeWhileFn() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1, 1, 1, 4, 1)
-	takes := chans.TakeWhileFn(procCtx.Done(), numbers, func() int { return 1 })
+	numbers := chans.GeneratorContext(procCtx, 1, 1, 1, 4, 1)
+	takes := chans.TakeWhileFnContext(procCtx, numbers, func() int { return 1 })
 
 	for v := range takes {
 		fmt.Println(v)
@@ -851,12 +818,11 @@ func ExampleTee() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
-	numbers := chans.Generator(procCtx.Done(), 1)
-	ch1, ch2 := chans.Tee(procCtx.Done(), numbers)
+	numbers := chans.GeneratorContext(procCtx, 1)
+	ch1, ch2 := chans.TeeContext(procCtx, numbers)
 
 	var wg sync.WaitGroup
 	for _, ch := range []<-chan int{ch1, ch2} {
@@ -882,12 +848,11 @@ func ExampleToInt() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		gens <-chan int = chans.Generator(procCtx.Done(), 1, 2)
+		gens <-chan int = chans.GeneratorContext(procCtx, 1, 2)
 		ints <-chan int = chans.ToInt(procCtx.Done(), gens, -1)
 	)
 
@@ -906,12 +871,11 @@ func ExampleToString() {
 		mainCtx, mainCxl = context.WithCancel(rootCtx)
 		procCtx, procCxl = context.WithTimeout(mainCtx, 50*time.Millisecond)
 	)
-
 	defer mainCxl()
 	defer procCxl()
 
 	var (
-		gens <-chan string = chans.Generator(procCtx.Done(), "hello", "world")
+		gens <-chan string = chans.GeneratorContext(procCtx, "hello", "world")
 		strs <-chan string = chans.ToString(procCtx.Done(), gens, "")
 	)
 

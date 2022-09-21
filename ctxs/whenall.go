@@ -8,7 +8,10 @@ import (
 
 // WhenAll は、chans.WhenAll() の context.Context 版です.
 //
-// 指定したコンテキストが全て完了したら完了となる context.Context を生成して返します.
+// 以下の条件のいずれかが満たされた場合に完了となる context.Context を生成して返します.
+//
+//   - pCtx が完了
+//   - pCtx 以外のコンテキストが全て完了
 //
 // Example:
 //
