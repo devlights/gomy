@@ -1,5 +1,6 @@
-# gomy
- This package is a personal library for Go language.
+# What's this?
+
+This package is a personal library for Go language.
 
 For more information, see [![PkgGoDev](https://pkg.go.dev/badge/github.com/devlights/gomy)](https://pkg.go.dev/github.com/devlights/gomy) .
 

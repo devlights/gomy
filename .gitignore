@@ -15,6 +15,7 @@
 # vendor/
 
 # Project specific
+.idea/
 /splitbin
 /disphex
 /splitrec
