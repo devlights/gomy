@@ -1,7 +1,9 @@
 package misc
 
 import (
+	"context"
 	"fmt"
+	"math"
 	"os/exec"
 	"runtime"
 )
@@ -36,4 +38,41 @@ func OpenBrowser(url string) error {
 
 	c := exec.Command(cmd, append(args, url)...)
 	return c.Start()
+}
+
+func PrimeNumber(ctx context.Context, limit int) chan int {
+	ctx, cxl := context.WithCancel(ctx)
+	ch := make(chan int)
+
+	go func() {
+		defer cxl()
+		defer close(ch)
+
+		ch <- 2
+
+	OUTER:
+		for i := 3; i < limit; i += 2 {
+			l := int(math.Sqrt(float64(i)))
+
+			found := false
+		INNER:
+			for j := 3; j < l+1; j += 2 {
+				select {
+				case <-ctx.Done():
+					break OUTER
+				default:
+					if i%j == 0 {
+						found = true
+						break INNER
+					}
+				}
+			}
+
+			if !found {
+				ch <- i
+			}
+		}
+	}()
+
+	return ch
 }
