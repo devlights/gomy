@@ -40,6 +40,7 @@ func OpenBrowser(url string) error {
 	return c.Start()
 }
 
+// PrimeNumber は、指定されたリミットまでの素数を求めます。
 func PrimeNumber(ctx context.Context, limit int) chan int {
 	ctx, cxl := context.WithCancel(ctx)
 	ch := make(chan int)
