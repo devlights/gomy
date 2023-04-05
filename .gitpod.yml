@@ -1,10 +1,15 @@
-image: gitpod/workspace-go:latest
+image:
+  file: .gitpod.Dockerfile
 
 tasks:
-  - name: install staticcheck
-    init: go install honnef.co/go/tools/cmd/staticcheck@latest
-  - name: install go-task
-    init: go install github.com/go-task/task/v3/cmd/task@latest
+  - name: initial
+    init: go install github.com/go-task/task/v3/cmd/task@latest &&
+      go install honnef.co/go/tools/cmd/staticcheck@latest &&
+      go install golang.org/x/tools/cmd/goimports@latest &&
+      go install github.com/mgechev/revive@latest &&
+      go build std &&
+      task build
+    command: go version
 
 vscode:
   extensions:
