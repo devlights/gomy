@@ -2,6 +2,6 @@ module github.com/devlights/gomy
 
 go 1.20
 
-require golang.org/x/text v0.10.0
+require golang.org/x/text v0.11.0
 
-require golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
+require golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
