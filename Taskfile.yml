@@ -9,7 +9,7 @@ tasks:
   build:
     desc: Build app
     cmds:
-      - go build -race ./...
+      - go build ./...
   test:
     desc: Test
     cmds:
