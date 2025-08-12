@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"slices"
+
 	"github.com/devlights/gomy/chans"
 	"github.com/devlights/gomy/ctxs"
-	"golang.org/x/exp/slices"
 )
 
 func TestFanOutContext(t *testing.T) {

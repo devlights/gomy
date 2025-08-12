@@ -5,8 +5,9 @@ import (
 	"sync"
 	"testing"
 
+	"slices"
+
 	"github.com/devlights/gomy/chans"
-	"golang.org/x/exp/slices"
 )
 
 func TestTeeContext(t *testing.T) {
